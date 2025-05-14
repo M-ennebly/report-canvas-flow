@@ -21,6 +21,7 @@ export interface Document {
   type: string;
   url: string;
   dateUploaded: string;
+  label?: string; // Added optional label property
 }
 
 export interface Project {
