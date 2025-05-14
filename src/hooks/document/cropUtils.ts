@@ -26,12 +26,17 @@ export const cropImage = (
     return documentUrl || '';
   }
   
+  // Check if image is fully loaded
+  if (image.complete === false || image.naturalWidth === 0) {
+    console.error("Image is not fully loaded");
+    throw new Error("Image is not fully loaded");
+  }
+  
   // Calculate the actual coordinates on the image
   const imgRect = image.getBoundingClientRect();
   const scaleX = image.naturalWidth / imgRect.width;
   const scaleY = image.naturalHeight / imgRect.height;
   
-  // Draw the cropped portion of the image onto the canvas
   try {
     context.drawImage(
       image,
@@ -49,7 +54,7 @@ export const cropImage = (
     return canvas.toDataURL('image/png');
   } catch (err) {
     console.error("Error cropping image:", err);
-    return documentUrl || '';
+    throw err; // Re-throw to handle in the calling function
   }
 };
 

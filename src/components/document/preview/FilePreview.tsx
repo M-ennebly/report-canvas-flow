@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Document } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,12 @@ const FilePreview: React.FC<FilePreviewProps> = ({
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Reset image loaded state when document changes
+    setImageLoaded(false);
+  }, [document?.id]);
   
   if (!document) return null;
   
@@ -93,6 +99,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
               onLoad={() => {
                 // Ensure image is loaded before allowing cropping
                 console.log("Image loaded successfully");
+                setImageLoaded(true);
               }}
             />
           </div>
@@ -163,7 +170,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       <div className="w-full h-full relative">
         <ScrollArea className="h-full w-full">
           <div className="w-full h-full p-6">
-            {document.url && (
+            {document.url.startsWith('http') && (
               <iframe 
                 src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(document.url)}`}
                 className="w-full h-[calc(100vh-250px)] border"
@@ -171,9 +178,9 @@ const FilePreview: React.FC<FilePreviewProps> = ({
               />
             )}
             
-            {!document.url.includes('http') && (
+            {!document.url.startsWith('http') && document.url.startsWith('blob:') && (
               <div className="text-center p-6 bg-slate-50 rounded-md">
-                <p className="text-slate-600">DOCX preview requires a publicly accessible URL.</p>
+                <p className="text-slate-600">To preview this DOCX file, please save it first.</p>
                 <p className="text-sm text-slate-500 mt-2">File: {document.name}</p>
               </div>
             )}
@@ -188,12 +195,19 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       <div className="w-full h-full relative">
         <ScrollArea className="h-full w-full">
           <div className="w-full h-full p-6">
-            {document.url && (
+            {document.url.startsWith('http') && (
               <iframe 
                 src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(document.url)}`}
                 className="w-full h-[calc(100vh-250px)] border"
                 title={document.name}
               />
+            )}
+            
+            {!document.url.startsWith('http') && (
+              <div className="text-center p-6 bg-slate-50 rounded-md">
+                <p className="text-slate-600">To preview this PowerPoint file, please save it first.</p>
+                <p className="text-sm text-slate-500 mt-2">File: {document.name}</p>
+              </div>
             )}
           </div>
         </ScrollArea>

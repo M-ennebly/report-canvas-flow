@@ -20,7 +20,7 @@ const CroppingToolbar: React.FC<CroppingToolbarProps> = ({
   onCancelCrop,
   onCompleteCrop,
 }) => {
-  // Always show crop for images, no conditional check blocking it
+  // Show crop button for all document types
   if (!croppingMode) {
     return (
       <Button 

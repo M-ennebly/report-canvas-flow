@@ -1,13 +1,11 @@
 
 import { CroppedFigure } from "./types";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast"; 
 
 /**
  * Returns utility functions for managing figures
  */
 export const useFigureUtils = () => {
-  const { toast } = useToast();
-
   /**
    * Validates if all figures have required fields completed
    */

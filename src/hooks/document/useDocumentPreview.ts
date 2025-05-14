@@ -1,6 +1,6 @@
 
-import { useState, useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useRef, useEffect } from "react";
+import { toast } from "@/components/ui/use-toast";
 import { Document } from "@/types";
 import { 
   CroppedFigure, 
@@ -14,15 +14,6 @@ export function useDocumentPreview(
   document: Document | null,
   onSaveFigures?: (figures: CroppedFigure[]) => void
 ): UseDocumentPreviewReturn {
-  const { toast } = useToast();
-  const { 
-    validateFigures, 
-    showValidationError, 
-    showSaveSuccess,
-    updateFigureField,
-    deleteFigure
-  } = useFigureUtils();
-
   // State management
   const [croppingMode, setCroppingMode] = useState(false);
   const [cropStart, setCropStart] = useState<{ x: number; y: number } | null>(null);
@@ -30,6 +21,23 @@ export function useDocumentPreview(
   const [croppedFigures, setCroppedFigures] = useState<CroppedFigure[]>([]);
   const [activeFigureId, setActiveFigureId] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
+
+  // Reset state when document changes
+  useEffect(() => {
+    setCroppingMode(false);
+    setCropStart(null);
+    setCropEnd(null);
+    setCroppedFigures([]);
+    setActiveFigureId(null);
+  }, [document?.id]);
+
+  const { 
+    validateFigures, 
+    showValidationError, 
+    showSaveSuccess,
+    updateFigureField,
+    deleteFigure
+  } = useFigureUtils();
 
   // Determine if document is an image
   const isImage = isDocumentImage(document?.type);
@@ -81,14 +89,24 @@ export function useDocumentPreview(
     // For image documents, use canvas to crop
     let croppedImageUrl = "";
     if (isImage && imgRef.current) {
-      croppedImageUrl = cropImage(
-        imgRef.current,
-        cropStartX,
-        cropStartY, 
-        cropWidth,
-        cropHeight,
-        document?.url
-      );
+      try {
+        croppedImageUrl = cropImage(
+          imgRef.current,
+          cropStartX,
+          cropStartY, 
+          cropWidth,
+          cropHeight,
+          document?.url
+        );
+      } catch (error) {
+        console.error("Error cropping image:", error);
+        toast({
+          title: "Error cropping image",
+          description: "There was an error processing this image. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
     } 
     // For non-image documents, use a screenshot approach or placeholder
     else {
