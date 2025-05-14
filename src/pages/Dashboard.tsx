@@ -17,15 +17,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import UploadDropzone from "@/components/upload/UploadDropzone";
 import { Document } from "@/types";
+import EnhancedUploadSection from "@/components/upload/EnhancedUploadSection";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [projectName, setProjectName] = useState("New Project");
   const [uploadMode, setUploadMode] = useState<"bulk" | "label">("bulk");
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  
+  // Enhanced upload states
+  const [bulkFiles, setBulkFiles] = useState<FileList | null>(null);
+  const [bulkDocuments, setBulkDocuments] = useState<Document[]>([]);
+  const [labelFiles, setLabelFiles] = useState<FileList | null>(null);
+  const [labelDocuments, setLabelDocuments] = useState<Document[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Demo projects data
   const projects = [
@@ -59,26 +66,77 @@ const Dashboard = () => {
     }
   ];
 
-  // Handle file upload
-  const handleFilesSelected = (files: FileList) => {
-    setSelectedFiles(files);
-  };
-
-  // Create new project
-  const handleCreateProject = () => {
-    if (!selectedFiles || selectedFiles.length === 0) {
-      toast.error("Please upload at least one document");
-      return;
-    }
-
-    // Convert files to Document objects for storage
-    const documents: Document[] = Array.from(selectedFiles).map(file => ({
+  // Handle bulk upload
+  const handleBulkUpload = (files: FileList) => {
+    setBulkFiles(files);
+    
+    // Convert files to Document objects
+    const newDocuments: Document[] = Array.from(files).map(file => ({
       id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       name: file.name,
       type: file.name.split(".").pop() || "unknown",
       url: URL.createObjectURL(file),
       dateUploaded: new Date().toISOString()
     }));
+    
+    setBulkDocuments(prev => [...prev, ...newDocuments]);
+  };
+
+  // Handle label upload
+  const handleLabelUpload = (files: FileList, labelId: string) => {
+    setLabelFiles(files);
+    if (!selectedLabels.includes(labelId)) {
+      setSelectedLabels(prev => [...prev, labelId]);
+    }
+    
+    // Convert files to Document objects with label
+    const newDocuments: Document[] = Array.from(files).map(file => ({
+      id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      type: file.name.split(".").pop() || "unknown",
+      url: URL.createObjectURL(file),
+      dateUploaded: new Date().toISOString(),
+      label: labelId
+    }));
+    
+    setLabelDocuments(prev => [...prev, ...newDocuments]);
+  };
+
+  // Process files based on upload mode
+  const handleProcessFiles = (mode: 'bulk' | 'label') => {
+    const documents = mode === 'bulk' ? bulkDocuments : labelDocuments;
+    if (documents.length === 0) {
+      toast.error("Please upload at least one document");
+      return;
+    }
+    
+    // Store project data in session storage
+    sessionStorage.setItem('uploadedDocuments', JSON.stringify(documents));
+    sessionStorage.setItem('projectData', JSON.stringify({ name: projectName }));
+    
+    // Close modal and navigate to workspace
+    setIsNewProjectModalOpen(false);
+    toast.success("Project created successfully");
+    navigate(`/workspace/${mode}`);
+  };
+
+  // Remove document from bulk upload
+  const removeBulkDocument = (docId: string) => {
+    setBulkDocuments(prev => prev.filter(doc => doc.id !== docId));
+  };
+
+  // Remove document from label upload
+  const removeLabelDocument = (docId: string) => {
+    setLabelDocuments(prev => prev.filter(doc => doc.id !== docId));
+  };
+
+  // Create new project
+  const handleCreateProject = () => {
+    const documents = uploadMode === 'bulk' ? bulkDocuments : labelDocuments;
+    if (documents.length === 0) {
+      toast.error("Please upload at least one document");
+      return;
+    }
 
     // Store project data in session storage
     sessionStorage.setItem('uploadedDocuments', JSON.stringify(documents));
@@ -115,6 +173,18 @@ const Dashboard = () => {
     }
   };
 
+  // Reset all form data when opening the modal
+  const handleOpenModal = () => {
+    setProjectName("New Project");
+    setUploadMode("bulk");
+    setBulkFiles(null);
+    setBulkDocuments([]);
+    setLabelFiles(null);
+    setLabelDocuments([]);
+    setSelectedLabels([]);
+    setIsNewProjectModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
       <Header />
@@ -123,7 +193,7 @@ const Dashboard = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-slate-800">Digiclaim Dashboard</h1>
           <Button 
-            onClick={() => setIsNewProjectModalOpen(true)}
+            onClick={handleOpenModal}
             className="bg-kanban-analyse hover:bg-kanban-analyse/90 text-white"
           >
             <Plus className="mr-2 h-5 w-5" /> New Project
@@ -242,11 +312,11 @@ const Dashboard = () => {
       
       {/* New Project Modal */}
       <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Project</DialogTitle>
+            <DialogTitle className="text-2xl">Create New Project</DialogTitle>
             <DialogDescription>
-              Fill in the details below to create a new project
+              Fill in the project details and upload your documents
             </DialogDescription>
           </DialogHeader>
           
@@ -258,28 +328,29 @@ const Dashboard = () => {
                 value={projectName} 
                 onChange={(e) => setProjectName(e.target.value)} 
                 placeholder="Enter project name" 
+                className="w-full"
               />
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Upload Mode</label>
-              <select 
-                className="w-full h-10 px-3 py-2 text-sm border rounded-md"
-                value={uploadMode}
-                onChange={(e) => setUploadMode(e.target.value as "bulk" | "label")}
-              >
-                <option value="bulk">Bulk Upload</option>
-                <option value="label">Label-Based Upload</option>
-              </select>
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Upload Documents</label>
-              <UploadDropzone 
-                onFilesSelected={handleFilesSelected}
-                selectedFiles={selectedFiles}
-              />
-            </div>
+            {/* Enhanced Upload Section */}
+            <EnhancedUploadSection
+              bulkFiles={bulkFiles}
+              setBulkFiles={setBulkFiles}
+              bulkDocuments={bulkDocuments}
+              setBulkDocuments={setBulkDocuments}
+              labelFiles={labelFiles}
+              setLabelFiles={setLabelFiles}
+              labelDocuments={labelDocuments}
+              setLabelDocuments={setLabelDocuments}
+              isLoading={isLoading}
+              selectedLabels={selectedLabels}
+              setSelectedLabels={setSelectedLabels}
+              handleBulkUpload={handleBulkUpload}
+              handleLabelUpload={handleLabelUpload}
+              handleProcessFiles={handleProcessFiles}
+              removeBulkDocument={removeBulkDocument}
+              removeLabelDocument={removeLabelDocument}
+            />
           </div>
           
           <div className="mt-5 flex justify-end space-x-2">
