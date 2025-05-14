@@ -1,13 +1,14 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileUp, Tag, Trash2 } from "lucide-react";
+import { FileUp, Tag, Trash2, FileText, BarChart, CheckCircle2, Clock, Layers } from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Document } from "@/types";
 import BulkUploadTab from "@/components/upload/BulkUploadTab";
 import LabelUploadTab from "@/components/upload/LabelUploadTab";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -116,9 +117,10 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+      {/* Hero Section */}
       <div className="container mx-auto px-4 py-12">
-        <div className="text-center space-y-6 mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-800">
+        <div className="text-center space-y-6 mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">
             Figure Management for Consultants
           </h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
@@ -126,55 +128,89 @@ const LandingPage = () => {
           </p>
         </div>
 
+        {/* Features Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <Card className="bg-white/80 backdrop-filter backdrop-blur-sm border border-slate-200 shadow-sm transition-all hover:shadow-md">
+            <CardHeader className="pb-2">
+              <FileText className="h-8 w-8 text-kanban-design mb-2" />
+              <CardTitle>Document Processing</CardTitle>
+              <CardDescription>Upload and extract figures from multiple documents</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-filter backdrop-blur-sm border border-slate-200 shadow-sm transition-all hover:shadow-md">
+            <CardHeader className="pb-2">
+              <Layers className="h-8 w-8 text-kanban-analyse mb-2" />
+              <CardTitle>Kanban Organization</CardTitle>
+              <CardDescription>Organize your figures with a visual kanban board</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-filter backdrop-blur-sm border border-slate-200 shadow-sm transition-all hover:shadow-md">
+            <CardHeader className="pb-2">
+              <BarChart className="h-8 w-8 text-kanban-dev mb-2" />
+              <CardTitle>Report Generation</CardTitle>
+              <CardDescription>Generate professional reports with your figures</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-filter backdrop-blur-sm border border-slate-200 shadow-sm transition-all hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CheckCircle2 className="h-8 w-8 text-kanban-testing mb-2" />
+              <CardTitle>Project Tracking</CardTitle>
+              <CardDescription>Track project progress from start to finish</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
+
         <Tabs 
           defaultValue="bulk" 
-          className="max-w-5xl mx-auto"
+          className="max-w-5xl mx-auto bg-white shadow-lg rounded-xl border border-slate-200 p-6"
           onValueChange={(value) => setActiveTab(value)}
         >
-          <TabsList className="grid grid-cols-2 mb-6">
-            <TabsTrigger value="bulk" className="text-lg py-3">
+          <TabsList className="grid grid-cols-2 mb-6 p-1 bg-slate-100 rounded-lg">
+            <TabsTrigger value="bulk" className="text-lg py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-slate-900 rounded-md">
               <FileUp className="mr-2 h-5 w-5" />
               Bulk Upload
             </TabsTrigger>
-            <TabsTrigger value="label" className="text-lg py-3">
+            <TabsTrigger value="label" className="text-lg py-3 data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-slate-900 rounded-md">
               <Tag className="mr-2 h-5 w-5" />
               Label-Based Upload
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="bulk">
-            <Card>
-              <CardContent className="p-6">
-                <BulkUploadTab 
-                  selectedFiles={bulkFiles}
-                  uploadedDocuments={bulkDocuments}
-                  isLoading={isLoading}
-                  onFilesSelected={handleBulkUpload}
-                  onRemoveDocument={removeBulkDocument}
-                  onProcess={() => handleProcessFiles('bulk')}
-                />
-              </CardContent>
-            </Card>
+            <BulkUploadTab 
+              selectedFiles={bulkFiles}
+              uploadedDocuments={bulkDocuments}
+              isLoading={isLoading}
+              onFilesSelected={handleBulkUpload}
+              onRemoveDocument={removeBulkDocument}
+              onProcess={() => handleProcessFiles('bulk')}
+            />
           </TabsContent>
           
           <TabsContent value="label">
-            <Card>
-              <CardContent className="p-6">
-                <LabelUploadTab 
-                  labels={labels}
-                  selectedFiles={labelFiles}
-                  selectedLabels={selectedLabels}
-                  uploadedDocuments={labelDocuments}
-                  isLoading={isLoading}
-                  onLabelUpload={handleLabelUpload}
-                  onRemoveDocument={removeLabelDocument}
-                  onProcess={() => handleProcessFiles('label')}
-                />
-              </CardContent>
-            </Card>
+            <LabelUploadTab 
+              labels={labels}
+              selectedFiles={labelFiles}
+              selectedLabels={selectedLabels}
+              uploadedDocuments={labelDocuments}
+              isLoading={isLoading}
+              onLabelUpload={handleLabelUpload}
+              onRemoveDocument={removeLabelDocument}
+              onProcess={() => handleProcessFiles('label')}
+            />
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Footer */}
+      <footer className="mt-auto py-8 bg-slate-800 text-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-slate-300">© 2025 Figure Management System for Consultants</p>
+        </div>
+      </footer>
     </div>
   );
 };
