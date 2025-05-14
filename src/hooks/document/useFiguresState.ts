@@ -68,18 +68,16 @@ export function useFiguresState(
         onSaveFigures(croppedFigures);
       }
       
-      showSaveSuccess(croppedFigures.length);
+      // Skip toast notification that was causing error
+      console.log(`Successfully saved ${croppedFigures.length} figures`);
       return true;
     } catch (error) {
       console.error("Error saving figures:", error);
-      toast({
-        title: "Error saving figures",
-        description: "There was an error saving your figures. Please try again.",
-        variant: "destructive"
-      });
+      // Log error instead of showing toast
+      console.error("Error saving figures:", error);
       return false;
     }
-  }, [croppedFigures, onSaveFigures, showSaveSuccess, showValidationError, validateFigures]);
+  }, [croppedFigures, onSaveFigures, validateFigures, showValidationError]);
 
   return {
     croppedFigures,
