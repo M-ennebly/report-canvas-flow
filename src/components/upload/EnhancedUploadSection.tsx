@@ -72,7 +72,7 @@ const EnhancedUploadSection = ({
           onValueChange={(value) => setActiveTab(value)}
         >
           <div className="p-6 bg-gradient-to-r from-slate-50 to-white border-b border-slate-200">
-            <TabsList className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-lg shadow-inner">
+            <TabsList className="grid grid-cols-2 gap-2 p-1 bg-white rounded-lg">
               <TabsTrigger 
                 value="bulk" 
                 className="text-base py-3 px-4 data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-slate-900 data-[state=active]:border-b-2 data-[state=active]:border-kanban-analyse rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
