@@ -21,7 +21,7 @@ export interface Document {
   type: string;
   url: string;
   dateUploaded: string;
-  label?: string; // Added optional label property
+  label?: string;
 }
 
 export interface Project {
@@ -31,4 +31,12 @@ export interface Project {
   documents: Document[];
   tasks: Task[];
   linkedReportId?: string;
+}
+
+export interface CroppedFigure {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  sourceDocumentId: string;
 }

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FileImage, Trash2, Image, Files, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
+import DocumentPreviewModal from "@/components/document/DocumentPreviewModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,7 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
   showLabels = false,
 }) => {
   const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+  const [documentToPreview, setDocumentToPreview] = useState<Document | null>(null);
   
   if (documents.length === 0) return null;
   
@@ -67,6 +69,17 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
     }
   };
   
+  const handleEditClick = (document: Document) => {
+    setDocumentToPreview(document);
+  };
+  
+  const handleSaveFigures = (figures: any[]) => {
+    // In a real app, we would save these figures to the state or database
+    if (figures.length > 0 && onExtractFigures && documentToPreview) {
+      onExtractFigures(documentToPreview.id);
+    }
+  };
+  
   return (
     <div className="mt-6 border rounded-md p-4 bg-white">
       <h3 className="font-medium mb-2">Selected Documents:</h3>
@@ -100,7 +113,7 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem
                     className="text-slate-600 cursor-pointer"
-                    onClick={() => alert("Edit feature not implemented yet")}
+                    onClick={() => handleEditClick(doc)}
                   >
                     <FileImage className="mr-2 h-4 w-4" />
                     Edit Document
@@ -137,6 +150,14 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
         onConfirm={handleConfirmDelete}
         title="Remove Document"
         description="Are you sure you want to remove this document from the selection? You can add it again later if needed."
+      />
+      
+      {/* Document Preview Modal */}
+      <DocumentPreviewModal
+        document={documentToPreview}
+        isOpen={!!documentToPreview}
+        onClose={() => setDocumentToPreview(null)}
+        onSaveFigures={handleSaveFigures}
       />
     </div>
   );

@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { FileImage, Trash2, FileText, Image, Files, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
+import DocumentPreviewModal from "@/components/document/DocumentPreviewModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface DocumentListProps {
   documents: Document[];
@@ -24,6 +26,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onExtractFigures
 }) => {
   const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+  const [documentToPreview, setDocumentToPreview] = useState<Document | null>(null);
 
   if (documents.length === 0) return null;
 
@@ -69,6 +72,17 @@ const DocumentList: React.FC<DocumentListProps> = ({
       setDocumentToDelete(null);
     }
   };
+  
+  const handleEditClick = (document: Document) => {
+    setDocumentToPreview(document);
+  };
+  
+  const handleSaveFigures = (figures: any[]) => {
+    // In a real app, we would save these figures to the state or database
+    if (figures.length > 0 && onExtractFigures && documentToPreview) {
+      onExtractFigures(documentToPreview.id);
+    }
+  };
 
   return (
     <div className="mt-6 space-y-3 max-h-48 overflow-y-auto">
@@ -108,7 +122,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem 
                     className="text-slate-600 cursor-pointer"
-                    onClick={() => alert("Edit feature not implemented yet")}
+                    onClick={() => handleEditClick(doc)}
                   >
                     <FileText className="mr-2 h-4 w-4" />
                     Edit Document
@@ -147,6 +161,14 @@ const DocumentList: React.FC<DocumentListProps> = ({
         onConfirm={handleConfirmDelete}
         title="Delete Document"
         description="Are you sure you want to delete this document? This action cannot be undone."
+      />
+      
+      {/* Document Preview Modal */}
+      <DocumentPreviewModal
+        document={documentToPreview}
+        isOpen={!!documentToPreview}
+        onClose={() => setDocumentToPreview(null)}
+        onSaveFigures={handleSaveFigures}
       />
     </div>
   );
