@@ -1,13 +1,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Task } from "@/types";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TaskEditorHeader from "./TaskEditorHeader";
-import TaskEditorFigure from "./TaskEditorFigure";
 import TaskEditorFooter from "./TaskEditorFooter";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import TaskEditorForm from "./TaskEditorForm";
+import TaskEditorFiguresSection from "./TaskEditorFiguresSection";
 import { toast } from "@/hooks/use-toast";
 
 interface TaskEditorSidebarProps {
@@ -26,7 +23,6 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
   onDeleteFigure,
 }) => {
   const [editedTask, setEditedTask] = useState<Task | null>(null);
-  const [isFiguresSectionOpen, setIsFiguresSectionOpen] = useState(true);
   const [collapsedFigures, setCollapsedFigures] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -104,14 +100,6 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
     }));
   };
 
-  // Column display names
-  const columnNames = {
-    design: "Design",
-    analyse: "Analysis",
-    dev: "Development",
-    testing: "Testing"
-  };
-  
   // Column colors 
   const columnColors = {
     design: "bg-gradient-to-r from-rose-400 to-rose-500",
@@ -131,77 +119,20 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
         
         <div className="flex-grow overflow-y-auto p-6">
           <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Task Title</label>
-              <Input
-                value={editedTask.title}
-                onChange={handleTitleChange}
-                className="border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                placeholder="Enter task title"
-              />
-            </div>
+            <TaskEditorForm 
+              task={editedTask}
+              onTitleChange={handleTitleChange}
+              onColumnChange={handleColumnChange}
+            />
             
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Task Column/Label</label>
-              <Select
-                value={editedTask.column}
-                onValueChange={handleColumnChange}
-              >
-                <SelectTrigger className="w-full border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                  <SelectValue placeholder="Select column" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="design" className="flex items-center">
-                    <span className="w-3 h-3 rounded-full bg-rose-500 mr-2"></span>
-                    {columnNames.design}
-                  </SelectItem>
-                  <SelectItem value="analyse" className="flex items-center">
-                    <span className="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-                    {columnNames.analyse}
-                  </SelectItem>
-                  <SelectItem value="dev" className="flex items-center">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>
-                    {columnNames.dev}
-                  </SelectItem>
-                  <SelectItem value="testing" className="flex items-center">
-                    <span className="w-3 h-3 rounded-full bg-amber-500 mr-2"></span>
-                    {columnNames.testing}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="rounded-lg bg-gray-50 shadow-sm border overflow-hidden">
-              <div className="flex items-center justify-between w-full px-4 py-3 bg-gray-100">
-                <h3 className="text-md font-medium flex items-center">
-                  <span className="mr-2">Figures</span>
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                    {editedTask.figures.length}
-                  </span>
-                </h3>
-              </div>
-              
-              <div className="p-4 space-y-4">
-                {editedTask.figures.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500">
-                    No figures attached to this task
-                  </div>
-                ) : (
-                  editedTask.figures.map((figure, index) => (
-                    <TaskEditorFigure
-                      key={figure.id}
-                      figure={figure}
-                      index={index}
-                      isCollapsed={!!collapsedFigures[figure.id]}
-                      onToggleCollapse={() => toggleFigureCollapse(figure.id)}
-                      onTitleChange={(value) => handleFigureTitleChange(figure.id, value)}
-                      onDescriptionChange={(value) => handleFigureDescriptionChange(figure.id, value)}
-                      onDelete={() => handleDeleteFigure(figure.id)}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
+            <TaskEditorFiguresSection
+              figures={editedTask.figures}
+              collapsedFigures={collapsedFigures}
+              onToggleFigureCollapse={toggleFigureCollapse}
+              onFigureTitleChange={handleFigureTitleChange}
+              onFigureDescriptionChange={handleFigureDescriptionChange}
+              onDeleteFigure={handleDeleteFigure}
+            />
           </div>
         </div>
         
