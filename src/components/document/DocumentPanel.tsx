@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FileUp, Trash2 } from "lucide-react";
+import { FileUp, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
 interface DocumentPanelProps {
@@ -92,12 +93,12 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
                   key={doc.id}
                   className="flex items-center justify-between p-2 text-sm rounded-md hover:bg-slate-50 border border-slate-100"
                 >
-                  <div className="flex items-center flex-1">
+                  <div className="flex items-center flex-1 min-w-0">
                     <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2">
                       {doc.type === "pdf" ? "PDF" : doc.type === "docx" ? "DOC" : "PPT"}
                     </div>
-                    <div className="flex-1 overflow-hidden">
-                      <p className="truncate">{doc.name}</p>
+                    <div className="overflow-hidden">
+                      <p className="truncate mr-2">{doc.name}</p>
                     </div>
                   </div>
                   {onDocumentDelete && (
@@ -105,7 +106,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
                       variant="ghost" 
                       size="sm"
                       onClick={() => handleDeleteDocument(doc.id)}
-                      className="text-slate-500 hover:text-red-500"
+                      className="text-slate-500 hover:text-red-500 flex-shrink-0"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -116,40 +117,49 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
           )}
         </div>
         
-        {/* Project Description Section */}
-        <div className="p-4 border-b">
-          <h3 className="text-sm font-medium mb-3">Project Description</h3>
-          <Textarea
-            value={description}
-            onChange={handleDescriptionChange}
-            placeholder="Describe your project here..."
-            className="resize-none h-32"
-          />
-        </div>
-        
-        {/* Linked Report Section */}
-        <div className="p-4">
-          <h3 className="text-sm font-medium mb-3">Linked Report</h3>
-          <Select
-            value={project.linkedReportId || "none"}
-            onValueChange={onLinkedReportChange}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a report" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
-              {availableReports.map((report) => (
-                <SelectItem key={report.id} value={report.id}>
-                  {report.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Collapsible sections using Accordion */}
+        <Accordion type="single" collapsible className="w-full">
+          {/* Project Description Section */}
+          <AccordionItem value="description">
+            <AccordionTrigger className="px-4 py-3 text-sm font-medium">
+              Project Description
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 pt-0">
+              <Textarea
+                value={description}
+                onChange={handleDescriptionChange}
+                placeholder="Describe your project here..."
+                className="resize-none h-32"
+              />
+            </AccordionContent>
+          </AccordionItem>
+          
+          {/* Linked Report Section */}
+          <AccordionItem value="linkedReport">
+            <AccordionTrigger className="px-4 py-3 text-sm font-medium">
+              Linked Report
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 pt-0">
+              <Select
+                value={project.linkedReportId || "none"}
+                onValueChange={onLinkedReportChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a report" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {availableReports.map((report) => (
+                    <SelectItem key={report.id} value={report.id}>
+                      {report.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
-      
-      {/* Removed the "Generate Project Report" button from here */}
     </div>
   );
 };
