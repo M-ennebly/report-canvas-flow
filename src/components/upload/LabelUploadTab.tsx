@@ -64,7 +64,7 @@ const LabelUploadTab: React.FC<LabelUploadTabProps> = ({
       <div className="flex justify-center mt-6">
         <Button 
           onClick={onProcess}
-          disabled={!selectedFiles || selectedLabels.length === 0 || isLoading}
+          disabled={uploadedDocuments.length === 0 || selectedLabels.length === 0 || isLoading}
           size="lg"
         >
           {isLoading ? (

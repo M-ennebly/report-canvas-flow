@@ -11,10 +11,17 @@ import LabelUploadTab from "@/components/upload/LabelUploadTab";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  
+  // Separate state for bulk and label uploads
+  const [bulkFiles, setBulkFiles] = useState<FileList | null>(null);
+  const [bulkDocuments, setBulkDocuments] = useState<Document[]>([]);
+  
+  const [labelFiles, setLabelFiles] = useState<FileList | null>(null);
+  const [labelDocuments, setLabelDocuments] = useState<Document[]>([]);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
-  const [uploadedDocuments, setUploadedDocuments] = useState<Document[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("bulk");
   
   const labels = [
     { id: "design", name: "Design", color: "bg-kanban-design" },
@@ -33,8 +40,8 @@ const LandingPage = () => {
       dateUploaded: new Date().toISOString(),
     }));
     
-    setSelectedFiles(files);
-    setUploadedDocuments(newDocs);
+    setBulkFiles(files);
+    setBulkDocuments(newDocs);
     toast.success(`${files.length} document(s) selected`);
   };
 
@@ -48,8 +55,8 @@ const LandingPage = () => {
       dateUploaded: new Date().toISOString(),
     }));
     
-    setSelectedFiles(files);
-    setUploadedDocuments(newDocs);
+    setLabelFiles(files);
+    setLabelDocuments(newDocs);
     
     if (!selectedLabels.includes(labelId)) {
       setSelectedLabels([...selectedLabels, labelId]);
@@ -58,7 +65,12 @@ const LandingPage = () => {
   };
 
   const handleProcessFiles = (uploadType: 'bulk' | 'label') => {
-    if (!selectedFiles || selectedFiles.length === 0) {
+    if (uploadType === 'bulk' && (!bulkFiles || bulkFiles.length === 0)) {
+      toast.error("Please select at least one file to upload");
+      return;
+    }
+
+    if (uploadType === 'label' && (!labelFiles || labelFiles.length === 0)) {
       toast.error("Please select at least one file to upload");
       return;
     }
@@ -70,23 +82,32 @@ const LandingPage = () => {
 
     setIsLoading(true);
 
-    // Store the documents in sessionStorage
-    sessionStorage.setItem('uploadedDocuments', JSON.stringify(uploadedDocuments));
-    
-    if (uploadType === 'label') {
+    // Store the appropriate documents in sessionStorage
+    if (uploadType === 'bulk') {
+      sessionStorage.setItem('uploadedDocuments', JSON.stringify(bulkDocuments));
+      navigate("/workspace/bulk");
+    } else {
+      sessionStorage.setItem('uploadedDocuments', JSON.stringify(labelDocuments));
       sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
       navigate(`/workspace/label/${selectedLabels[0]}`);
-    } else {
-      navigate("/workspace/bulk");
     }
   };
 
-  const removeDocument = (docId: string) => {
-    setUploadedDocuments(prevDocs => prevDocs.filter(doc => doc.id !== docId));
+  const removeBulkDocument = (docId: string) => {
+    setBulkDocuments(prevDocs => prevDocs.filter(doc => doc.id !== docId));
     
     // If we've removed all documents, clear the selected files
-    if (uploadedDocuments.length <= 1) {
-      setSelectedFiles(null);
+    if (bulkDocuments.length <= 1) {
+      setBulkFiles(null);
+    }
+  };
+
+  const removeLabelDocument = (docId: string) => {
+    setLabelDocuments(prevDocs => prevDocs.filter(doc => doc.id !== docId));
+    
+    // If we've removed all documents, clear the selected files
+    if (labelDocuments.length <= 1) {
+      setLabelFiles(null);
     }
   };
 
@@ -102,7 +123,11 @@ const LandingPage = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="bulk" className="max-w-5xl mx-auto">
+        <Tabs 
+          defaultValue="bulk" 
+          className="max-w-5xl mx-auto"
+          onValueChange={(value) => setActiveTab(value)}
+        >
           <TabsList className="grid grid-cols-2 mb-6">
             <TabsTrigger value="bulk" className="text-lg py-3">
               <FileUp className="mr-2 h-5 w-5" />
@@ -118,11 +143,11 @@ const LandingPage = () => {
             <Card>
               <CardContent className="p-6">
                 <BulkUploadTab 
-                  selectedFiles={selectedFiles}
-                  uploadedDocuments={uploadedDocuments}
+                  selectedFiles={bulkFiles}
+                  uploadedDocuments={bulkDocuments}
                   isLoading={isLoading}
                   onFilesSelected={handleBulkUpload}
-                  onRemoveDocument={removeDocument}
+                  onRemoveDocument={removeBulkDocument}
                   onProcess={() => handleProcessFiles('bulk')}
                 />
               </CardContent>
@@ -134,12 +159,12 @@ const LandingPage = () => {
               <CardContent className="p-6">
                 <LabelUploadTab 
                   labels={labels}
-                  selectedFiles={selectedFiles}
+                  selectedFiles={labelFiles}
                   selectedLabels={selectedLabels}
-                  uploadedDocuments={uploadedDocuments}
+                  uploadedDocuments={labelDocuments}
                   isLoading={isLoading}
                   onLabelUpload={handleLabelUpload}
-                  onRemoveDocument={removeDocument}
+                  onRemoveDocument={removeLabelDocument}
                   onProcess={() => handleProcessFiles('label')}
                 />
               </CardContent>

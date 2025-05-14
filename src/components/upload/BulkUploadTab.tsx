@@ -43,7 +43,7 @@ const BulkUploadTab: React.FC<BulkUploadTabProps> = ({
       <div className="flex justify-center mt-6">
         <Button 
           onClick={onProcess}
-          disabled={!selectedFiles || isLoading}
+          disabled={uploadedDocuments.length === 0 || isLoading}
           size="lg"
         >
           {isLoading ? (
