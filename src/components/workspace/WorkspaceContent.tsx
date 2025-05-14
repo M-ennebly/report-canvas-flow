@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { Document, Task } from "@/types";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import DocumentPanel from "@/components/document/DocumentPanel";
@@ -6,7 +7,6 @@ import TaskEditorSidebar from "@/components/task/TaskEditorSidebar";
 import MobileDocumentPanel from "./MobileDocumentPanel";
 import MobileDocumentToggle from "./MobileDocumentToggle";
 import { useProjectState } from "@/hooks/useProjectState";
-import { toast } from "sonner";
 
 interface WorkspaceContentProps {
   labelId?: string;
@@ -35,14 +35,6 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   // Selected task for editing
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-
-  // Process initial documents from props
-  useEffect(() => {
-    if (initialDocuments && initialDocuments.length > 0) {
-      console.log("Initial documents received:", initialDocuments);
-      handleDocumentUpload(initialDocuments);
-    }
-  }, []);
 
   const handleTaskClick = (taskId: string) => {
     const task = project.tasks.find((t) => t.id === taskId);

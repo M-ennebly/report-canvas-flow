@@ -20,13 +20,18 @@ const Workspace = () => {
         const documents = JSON.parse(storedDocuments);
         if (Array.isArray(documents) && documents.length > 0) {
           setUploadedDocuments(documents);
+          console.log("Loaded documents from session storage:", documents);
           toast.success(`${documents.length} documents are ready to use`);
+        } else {
+          console.log("No documents found in session storage or empty array");
+          toast.info("No documents were uploaded");
         }
       } catch (error) {
         console.error("Error parsing uploaded documents:", error);
         toast.error("There was an error loading your documents");
       }
     } else {
+      console.log("No documents found in session storage");
       toast.info("No documents were uploaded");
     }
     

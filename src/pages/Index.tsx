@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ const LandingPage = () => {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [uploadedDocuments, setUploadedDocuments] = useState<Document[]>([]);
   
   const labels = [
     { id: "design", name: "Design", color: "bg-kanban-design" },
@@ -22,12 +24,33 @@ const LandingPage = () => {
   ];
 
   const handleBulkUpload = (files: FileList) => {
+    // Convert FileList to Document[] for preview
+    const newDocs: Document[] = Array.from(files).map(file => ({
+      id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      type: file.name.split(".").pop() || "unknown",
+      url: URL.createObjectURL(file),
+      dateUploaded: new Date().toISOString(),
+    }));
+    
     setSelectedFiles(files);
+    setUploadedDocuments(newDocs);
     toast.success(`${files.length} document(s) selected`);
   };
 
   const handleLabelUpload = (files: FileList, labelId: string) => {
+    // Convert FileList to Document[] for preview
+    const newDocs: Document[] = Array.from(files).map(file => ({
+      id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      type: file.name.split(".").pop() || "unknown",
+      url: URL.createObjectURL(file),
+      dateUploaded: new Date().toISOString(),
+    }));
+    
     setSelectedFiles(files);
+    setUploadedDocuments(newDocs);
+    
     if (!selectedLabels.includes(labelId)) {
       setSelectedLabels([...selectedLabels, labelId]);
     }
@@ -47,23 +70,23 @@ const LandingPage = () => {
 
     setIsLoading(true);
 
-    // Convert FileList to Document[] 
-    const filesArray: Document[] = Array.from(selectedFiles).map(file => ({
-      id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: file.name,
-      type: file.name.split(".").pop() || "unknown",
-      url: URL.createObjectURL(file),
-      dateUploaded: new Date().toISOString(),
-    }));
-
     // Store the documents in sessionStorage
-    sessionStorage.setItem('uploadedDocuments', JSON.stringify(filesArray));
+    sessionStorage.setItem('uploadedDocuments', JSON.stringify(uploadedDocuments));
     
     if (uploadType === 'label') {
       sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
       navigate(`/workspace/label/${selectedLabels[0]}`);
     } else {
       navigate("/workspace/bulk");
+    }
+  };
+
+  const removeDocument = (docId: string) => {
+    setUploadedDocuments(prevDocs => prevDocs.filter(doc => doc.id !== docId));
+    
+    // If we've removed all documents, clear the selected files
+    if (uploadedDocuments.length <= 1) {
+      setSelectedFiles(null);
     }
   };
 
@@ -104,6 +127,33 @@ const LandingPage = () => {
                     onFilesSelected={handleBulkUpload}
                     selectedFiles={selectedFiles}
                   />
+                  
+                  {/* Document preview list */}
+                  {uploadedDocuments.length > 0 && (
+                    <div className="mt-6 border rounded-md p-4 bg-white">
+                      <h3 className="font-medium mb-2">Selected Documents:</h3>
+                      <ul className="space-y-2 max-h-60 overflow-y-auto">
+                        {uploadedDocuments.map(doc => (
+                          <li key={doc.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2 text-xs">
+                                {doc.type.toUpperCase()}
+                              </div>
+                              <span className="truncate">{doc.name}</span>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-slate-500 hover:text-red-500"
+                              onClick={() => removeDocument(doc.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   
                   <div className="flex justify-center mt-6">
                     <Button 
@@ -150,6 +200,33 @@ const LandingPage = () => {
                       </div>
                     ))}
                   </div>
+                  
+                  {/* Document preview list for label upload */}
+                  {uploadedDocuments.length > 0 && (
+                    <div className="mt-6 border rounded-md p-4 bg-white">
+                      <h3 className="font-medium mb-2">Selected Documents:</h3>
+                      <ul className="space-y-2 max-h-60 overflow-y-auto">
+                        {uploadedDocuments.map(doc => (
+                          <li key={doc.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2 text-xs">
+                                {doc.type.toUpperCase()}
+                              </div>
+                              <span className="truncate">{doc.name}</span>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-slate-500 hover:text-red-500"
+                              onClick={() => removeDocument(doc.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   
                   <div className="flex justify-center mt-6">
                     <Button 
