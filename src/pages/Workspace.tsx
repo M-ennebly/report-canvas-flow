@@ -18,12 +18,16 @@ const Workspace = () => {
     if (storedDocuments) {
       try {
         const documents = JSON.parse(storedDocuments);
-        setUploadedDocuments(documents);
-        
-        // Don't remove from session storage yet - WorkspaceContent will handle that
+        if (Array.isArray(documents) && documents.length > 0) {
+          setUploadedDocuments(documents);
+          toast.success(`${documents.length} documents are ready to use`);
+        }
       } catch (error) {
         console.error("Error parsing uploaded documents:", error);
+        toast.error("There was an error loading your documents");
       }
+    } else {
+      toast.info("No documents were uploaded");
     }
     
     // Check for selected labels in label-based upload
@@ -33,9 +37,6 @@ const Workspace = () => {
         try {
           const labels = JSON.parse(storedLabels);
           setSelectedLabels(labels);
-          
-          // Clear session storage
-          sessionStorage.removeItem('selectedLabels');
         } catch (error) {
           console.error("Error parsing selected labels:", error);
         }

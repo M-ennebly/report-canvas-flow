@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Project, Task, Document } from "@/types";
 import { generateDemoTasks } from "@/utils/demoData";
 import { toast } from "sonner";
@@ -13,9 +13,19 @@ export const useProjectState = (
     id: "demo-project",
     name: "Consultant Report Project",
     description: "",
-    documents: initialDocuments,
+    documents: [],
     tasks: generateDemoTasks(labelId, selectedLabels),
   });
+
+  // Initialize project with initial documents
+  useEffect(() => {
+    if (initialDocuments && initialDocuments.length > 0) {
+      setProject(prev => ({
+        ...prev,
+        documents: [...initialDocuments]
+      }));
+    }
+  }, [initialDocuments]);
 
   const handleTaskMove = (taskId: string, sourceColumn: string, targetColumn: string) => {
     setProject({
@@ -52,7 +62,7 @@ export const useProjectState = (
     });
   };
 
-  // Updated to handle both FileList and Document[] inputs
+  // Handle document upload - can take either FileList or Document[] inputs
   const handleDocumentUpload = (files: FileList | Document[]) => {
     let newDocuments: Document[] = [];
     
@@ -70,12 +80,13 @@ export const useProjectState = (
       newDocuments = files;
     }
 
-    setProject({
-      ...project,
-      documents: [...project.documents, ...newDocuments],
-    });
+    setProject(prev => ({
+      ...prev,
+      documents: [...prev.documents, ...newDocuments]
+    }));
     
     if (newDocuments.length > 0) {
+      console.log("Documents added:", newDocuments);
       toast.success(`${newDocuments.length} document(s) added`);
     }
   };

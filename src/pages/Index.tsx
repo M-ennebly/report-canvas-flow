@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { toast } from "sonner";
 import UploadDropzone from "@/components/upload/UploadDropzone";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Document } from "@/types";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -47,25 +47,24 @@ const LandingPage = () => {
 
     setIsLoading(true);
 
-    // Simulate processing time
-    setTimeout(() => {
-      const filesArray = Array.from(selectedFiles).map(file => ({
-        id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: file.name,
-        type: file.name.split(".").pop() || "unknown",
-        url: URL.createObjectURL(file),
-        dateUploaded: new Date().toISOString(),
-      }));
+    // Convert FileList to Document[] 
+    const filesArray: Document[] = Array.from(selectedFiles).map(file => ({
+      id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: file.name,
+      type: file.name.split(".").pop() || "unknown",
+      url: URL.createObjectURL(file),
+      dateUploaded: new Date().toISOString(),
+    }));
 
-      sessionStorage.setItem('uploadedDocuments', JSON.stringify(filesArray));
-      
-      if (uploadType === 'label') {
-        sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
-        navigate(`/workspace/label/${selectedLabels[0]}`);
-      } else {
-        navigate("/workspace/bulk");
-      }
-    }, 2000);
+    // Store the documents in sessionStorage
+    sessionStorage.setItem('uploadedDocuments', JSON.stringify(filesArray));
+    
+    if (uploadType === 'label') {
+      sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
+      navigate(`/workspace/label/${selectedLabels[0]}`);
+    } else {
+      navigate("/workspace/bulk");
+    }
   };
 
   return (

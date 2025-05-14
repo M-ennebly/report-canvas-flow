@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Document, Task } from "@/types";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
@@ -7,6 +6,7 @@ import TaskEditorSidebar from "@/components/task/TaskEditorSidebar";
 import MobileDocumentPanel from "./MobileDocumentPanel";
 import MobileDocumentToggle from "./MobileDocumentToggle";
 import { useProjectState } from "@/hooks/useProjectState";
+import { toast } from "sonner";
 
 interface WorkspaceContentProps {
   labelId?: string;
@@ -36,21 +36,11 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
-  // Initialize with documents from session storage if available
+  // Process initial documents from props
   useEffect(() => {
-    const storedDocuments = sessionStorage.getItem('uploadedDocuments');
-    if (storedDocuments) {
-      try {
-        const documents = JSON.parse(storedDocuments);
-        if (documents && documents.length > 0) {
-          handleDocumentUpload(documents);
-        }
-        
-        // Clear session storage after processing
-        sessionStorage.removeItem('uploadedDocuments');
-      } catch (error) {
-        console.error("Error parsing uploaded documents:", error);
-      }
+    if (initialDocuments && initialDocuments.length > 0) {
+      console.log("Initial documents received:", initialDocuments);
+      handleDocumentUpload(initialDocuments);
     }
   }, []);
 
