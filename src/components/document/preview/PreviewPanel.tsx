@@ -10,6 +10,7 @@ interface PreviewPanelProps {
   croppingMode: boolean;
   cropStart: { x: number; y: number } | null;
   cropEnd: { x: number; y: number } | null;
+  imgRef: React.RefObject<HTMLImageElement>;
   onStartCropping: () => void;
   onCancelCrop: () => void;
   onCompleteCrop: () => void;
@@ -25,6 +26,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
   croppingMode,
   cropStart,
   cropEnd,
+  imgRef,
   onStartCropping,
   onCancelCrop,
   onCompleteCrop,
@@ -57,6 +59,7 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
           croppingMode={croppingMode}
           cropStart={cropStart}
           cropEnd={cropEnd}
+          imgRef={imgRef}
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={onMouseUp}

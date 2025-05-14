@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Document } from "@/types";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -9,6 +8,7 @@ interface FilePreviewProps {
   croppingMode: boolean;
   cropStart: { x: number; y: number } | null;
   cropEnd: { x: number; y: number } | null;
+  imgRef: React.RefObject<HTMLImageElement>;
   onMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseUp: () => void;
@@ -20,6 +20,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   croppingMode,
   cropStart,
   cropEnd,
+  imgRef,
   onMouseDown,
   onMouseMove,
   onMouseUp,
@@ -47,6 +48,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
         >
           <div className="p-4 flex items-center justify-center">
             <img
+              ref={imgRef}
               src={document.url}
               alt={document.name}
               className="max-w-full object-contain"

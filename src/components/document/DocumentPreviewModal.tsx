@@ -30,6 +30,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     cropEnd,
     croppedFigures,
     activeFigureId,
+    imgRef,
     setCroppingMode,
     setActiveFigureId,
     handleStartCrop,
@@ -56,6 +57,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             croppingMode={croppingMode}
             cropStart={cropStart}
             cropEnd={cropEnd}
+            imgRef={imgRef}
             onStartCropping={() => setCroppingMode(true)}
             onCancelCrop={handleCancelCrop}
             onCompleteCrop={handleEndCrop}
