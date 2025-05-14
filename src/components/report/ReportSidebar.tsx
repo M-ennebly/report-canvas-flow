@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ChevronRight, ChevronLeft, Image, Task } from "lucide-react";
+import { ChevronRight, ChevronLeft, Image, FileText } from "lucide-react";
 import { Project, Task as TaskType } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -119,7 +119,7 @@ const ReportSidebar = ({
                               onClick={() => onTaskSelect(task.id)}
                             >
                               <div className="flex items-center">
-                                <Task className="h-4 w-4 mr-2" />
+                                <FileText className="h-4 w-4 mr-2" />
                                 <span className="truncate">{task.title}</span>
                               </div>
                               <ChevronRight
