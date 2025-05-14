@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileUp, Tag } from "lucide-react";
 import BulkUploadTab from "@/components/upload/BulkUploadTab";
 import LabelUploadTab from "@/components/upload/LabelUploadTab";
-import UploadInfoBox from "@/components/upload/UploadInfoBox";
 import { Document } from "@/types";
 
 interface EnhancedUploadSectionProps {
@@ -118,8 +117,6 @@ const EnhancedUploadSection = ({
                 onProcess={() => handleProcessFiles('label')}
               />
             </TabsContent>
-
-            <UploadInfoBox onSelectFilesClick={handleSelectFilesClick} />
           </div>
         </Tabs>
       </div>
