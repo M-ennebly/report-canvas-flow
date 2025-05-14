@@ -25,7 +25,32 @@ export const useProjectState = (
         documents: [...initialDocuments]
       }));
     }
+    
+    // Load project data from session storage if available
+    const storedProjectData = sessionStorage.getItem('projectData');
+    if (storedProjectData) {
+      try {
+        const projectData = JSON.parse(storedProjectData);
+        if (projectData.description) {
+          setProject(prev => ({
+            ...prev,
+            description: projectData.description
+          }));
+        }
+      } catch (error) {
+        console.error("Error loading project data:", error);
+      }
+    }
   }, [initialDocuments]);
+  
+  // Save tasks to session storage whenever they change
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('projectTasks', JSON.stringify(project.tasks));
+    } catch (error) {
+      console.error("Error saving tasks to session storage:", error);
+    }
+  }, [project.tasks]);
 
   const handleTaskMove = (taskId: string, sourceColumn: string, targetColumn: string) => {
     setProject({
@@ -73,6 +98,16 @@ export const useProjectState = (
       ...project,
       description,
     });
+    
+    // Save description to session storage
+    try {
+      sessionStorage.setItem('projectData', JSON.stringify({
+        ...JSON.parse(sessionStorage.getItem('projectData') || '{}'),
+        description
+      }));
+    } catch (error) {
+      console.error("Error saving project description:", error);
+    }
   };
 
   const handleLinkedReportChange = (reportId: string) => {
@@ -94,6 +129,7 @@ export const useProjectState = (
         type: file.name.split(".").pop() || "unknown",
         url: URL.createObjectURL(file),
         dateUploaded: new Date().toISOString(),
+        label: labelId
       }));
     } else {
       // Handle Document[] input from session storage
@@ -108,14 +144,32 @@ export const useProjectState = (
     if (newDocuments.length > 0) {
       console.log("Documents added:", newDocuments);
       toast.success(`${newDocuments.length} document(s) added`);
+      
+      // Save to session storage
+      try {
+        const allDocuments = [...project.documents, ...newDocuments];
+        sessionStorage.setItem('uploadedDocuments', JSON.stringify(allDocuments));
+      } catch (error) {
+        console.error("Error saving documents to session storage:", error);
+      }
     }
   };
   
   const handleDocumentDelete = (documentId: string) => {
+    const updatedDocuments = project.documents.filter(doc => doc.id !== documentId);
+    
     setProject({
       ...project,
-      documents: project.documents.filter(doc => doc.id !== documentId)
+      documents: updatedDocuments
     });
+    
+    // Update session storage
+    try {
+      sessionStorage.setItem('uploadedDocuments', JSON.stringify(updatedDocuments));
+    } catch (error) {
+      console.error("Error updating documents in session storage:", error);
+    }
+    
     toast.success("Document deleted");
   };
 

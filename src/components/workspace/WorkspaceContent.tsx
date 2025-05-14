@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { Document, Task } from "@/types";
+import React, { useState, useEffect } from "react";
+import { Document, Task, Project } from "@/types";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import DocumentPanel from "@/components/document/DocumentPanel";
 import TaskEditorSidebar from "@/components/task/TaskEditorSidebar";
@@ -12,12 +12,14 @@ interface WorkspaceContentProps {
   labelId?: string;
   initialDocuments?: Document[];
   selectedLabels?: string[];
+  onProjectUpdate?: (project: Project) => void;
 }
 
 const WorkspaceContent: React.FC<WorkspaceContentProps> = ({ 
   labelId,
   initialDocuments = [],
-  selectedLabels = []
+  selectedLabels = [],
+  onProjectUpdate
 }) => {
   const {
     project,
@@ -38,6 +40,13 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   // Selected task for editing
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  // Provide project state back to parent component
+  useEffect(() => {
+    if (onProjectUpdate) {
+      onProjectUpdate(project);
+    }
+  }, [project, onProjectUpdate]);
 
   const handleTaskClick = (taskId: string) => {
     const task = project.tasks.find((t) => t.id === taskId);

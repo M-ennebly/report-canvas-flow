@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Project } from "@/types";
+import { Project, Document } from "@/types";
 import ReportSidebar from "@/components/report/ReportSidebar";
 import ReportHeader from "@/components/report/ReportHeader";
 import ReportContent from "@/components/report/ReportContent";
+import { toast } from "sonner";
 
 const ReportPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -12,51 +13,72 @@ const ReportPage = () => {
   const [activeFigureId, setActiveFigureId] = useState<string | null>(null);
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   
-  // Demo data - in a real app, this would be fetched from an API
+  // Initialize with default project data
   const [project, setProject] = useState<Project>({
-    id: "demo-project",
+    id: projectId || "demo-project",
     name: "Consultant Report Project",
     description: "This is a comprehensive consulting project focused on market analysis and strategic recommendations.",
     documents: [],
-    tasks: [
-      {
-        id: "task1",
-        title: "Design System Architecture",
-        figures: [
-          { id: "fig1", title: "Market Segmentation", description: "Shows the breakdown of market segments", imageUrl: "https://picsum.photos/seed/chart1/300/200" },
-          { id: "fig2", title: "Customer Journey", description: "Visualization of the customer journey process", imageUrl: "https://picsum.photos/seed/chart2/300/200" },
-        ],
-        column: "design",
-      },
-      {
-        id: "task2",
-        title: "Market Analysis Report",
-        figures: [
-          { id: "fig3", title: "Product Architecture", description: "High-level product architecture", imageUrl: "https://picsum.photos/seed/chart3/300/200" },
-        ],
-        column: "analyse",
-      },
-      {
-        id: "task3",
-        title: "Develop Customer Portal",
-        figures: [
-          { id: "fig4", title: "Roadmap Timeline", description: "Timeline for product development", imageUrl: "https://picsum.photos/seed/chart4/300/200" },
-          { id: "fig5", title: "Team Structure", description: "Organization chart for the project team", imageUrl: "https://picsum.photos/seed/chart5/300/200" },
-        ],
-        column: "dev",
-      },
-      {
-        id: "task4",
-        title: "Test User Authentication",
-        figures: [
-          { id: "fig6", title: "Budget Allocation", description: "Budget breakdown by department", imageUrl: "https://picsum.photos/seed/chart6/300/200" },
-        ],
-        column: "testing",
-      },
-    ],
+    tasks: [],
   });
 
   useEffect(() => {
+    // Load project data from session storage (same as workspace)
+    const storedProjectData = sessionStorage.getItem('projectData');
+    const storedDocuments = sessionStorage.getItem('uploadedDocuments');
+    
+    // Try to load project description
+    if (storedProjectData) {
+      try {
+        const projectData = JSON.parse(storedProjectData);
+        if (projectData.description) {
+          setProject(prev => ({
+            ...prev,
+            description: projectData.description
+          }));
+        }
+      } catch (error) {
+        console.error("Error parsing project data:", error);
+      }
+    }
+    
+    // Try to load documents
+    if (storedDocuments) {
+      try {
+        const documents = JSON.parse(storedDocuments);
+        if (Array.isArray(documents) && documents.length > 0) {
+          setProject(prev => ({
+            ...prev,
+            documents: documents
+          }));
+          console.log("Loaded documents for report:", documents);
+        }
+      } catch (error) {
+        console.error("Error parsing uploaded documents:", error);
+      }
+    }
+    
+    // Try to load tasks from session storage
+    const storedTasks = sessionStorage.getItem('projectTasks');
+    if (storedTasks) {
+      try {
+        const tasks = JSON.parse(storedTasks);
+        if (Array.isArray(tasks) && tasks.length > 0) {
+          setProject(prev => ({
+            ...prev,
+            tasks: tasks
+          }));
+          console.log("Loaded tasks for report:", tasks);
+          toast.success(`Report generated with ${tasks.length} tasks`);
+        } else {
+          toast.info("No tasks found for the report");
+        }
+      } catch (error) {
+        console.error("Error parsing tasks:", error);
+        toast.error("Error loading tasks for report");
+      }
+    }
+
     // Scroll to element if active figure changes
     if (activeFigureId) {
       const element = document.getElementById(`figure-${activeFigureId}`);
@@ -69,7 +91,7 @@ const ReportPage = () => {
         element.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
-  }, [activeFigureId, activeTaskId]);
+  }, [activeFigureId, activeTaskId, projectId]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);

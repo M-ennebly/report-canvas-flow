@@ -11,6 +11,7 @@ const Workspace = () => {
   const navigate = useNavigate();
   const [uploadedDocuments, setUploadedDocuments] = useState<Document[]>([]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+  const [workspaceProject, setWorkspaceProject] = useState(null);
 
   useEffect(() => {
     // Check for uploaded documents in session storage
@@ -57,17 +58,24 @@ const Workspace = () => {
     navigate(`/report/demo-project`);
   };
 
+  // Callback to get the current project state from WorkspaceContent
+  const handleProjectUpdate = (project) => {
+    setWorkspaceProject(project);
+  };
+
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-slate-100">
       <WorkspaceHeader 
         projectName="Consultant Report Project"
         labelId={labelId}
         onGenerateReport={handleGenerateReport}
+        project={workspaceProject}
       />
       <WorkspaceContent 
         labelId={labelId} 
         initialDocuments={uploadedDocuments} 
         selectedLabels={selectedLabels}
+        onProjectUpdate={handleProjectUpdate}
       />
     </div>
   );
