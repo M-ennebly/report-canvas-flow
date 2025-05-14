@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import WorkspaceHeader from "@/components/workspace/WorkspaceHeader";
 import WorkspaceContent from "@/components/workspace/WorkspaceContent";
 import { Document } from "@/types";
@@ -23,18 +23,31 @@ const Workspace = () => {
         if (Array.isArray(documents) && documents.length > 0) {
           setUploadedDocuments(documents);
           console.log("Loaded documents from session storage:", documents);
-          toast.success(`${documents.length} documents are ready to use`);
+          toast({
+            title: "Documents loaded",
+            description: `${documents.length} documents are ready to use`
+          });
         } else {
           console.log("No documents found in session storage or empty array");
-          toast.info("No documents were uploaded");
+          toast({
+            title: "No documents",
+            description: "No documents were uploaded"
+          });
         }
       } catch (error) {
         console.error("Error parsing uploaded documents:", error);
-        toast.error("There was an error loading your documents");
+        toast({
+          title: "Error loading documents",
+          description: "There was an error loading your documents",
+          variant: "destructive"
+        });
       }
     } else {
       console.log("No documents found in session storage");
-      toast.info("No documents were uploaded");
+      toast({
+        title: "No documents",
+        description: "No documents were uploaded"
+      });
     }
     
     // Check for selected labels in label-based upload
@@ -50,7 +63,10 @@ const Workspace = () => {
       }
       
       if (labelId) {
-        toast.success(`Ready to work with documents for the ${labelId.charAt(0).toUpperCase() + labelId.slice(1)} stage`);
+        toast({
+          title: "Ready to work",
+          description: `Ready to work with documents for the ${labelId.charAt(0).toUpperCase() + labelId.slice(1)} stage`
+        });
       }
     }
 

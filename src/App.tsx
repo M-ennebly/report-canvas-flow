@@ -1,11 +1,11 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
 import LandingPage from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 import Workspace from "@/pages/Workspace";
 import ReportPage from "@/pages/ReportPage";
 import Dashboard from "@/pages/Dashboard";
+import { Toaster } from "@/components/ui/toaster";
 
 function App() {
   return (
