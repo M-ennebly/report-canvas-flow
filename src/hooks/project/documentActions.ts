@@ -11,14 +11,31 @@ export const createDocumentActions = (
     
     if (files instanceof FileList) {
       // Handle FileList input from file uploader
-      newDocuments = Array.from(files).map((file) => ({
-        id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: file.name,
-        type: file.name.split(".").pop() || "unknown",
-        url: URL.createObjectURL(file),
-        dateUploaded: new Date().toISOString(),
-        label: project.documents[0]?.label
-      }));
+      newDocuments = Array.from(files).map((file) => {
+        // Get file extension
+        const fileExtension = file.name.split(".").pop()?.toLowerCase() || "unknown";
+        
+        // Determine file type
+        let fileType = fileExtension;
+        if (["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"].includes(fileExtension)) {
+          fileType = "image";
+        } else if (["doc", "docx"].includes(fileExtension)) {
+          fileType = "word";
+        } else if (["xls", "xlsx"].includes(fileExtension)) {
+          fileType = "excel";
+        } else if (["ppt", "pptx"].includes(fileExtension)) {
+          fileType = "powerpoint";
+        }
+        
+        return {
+          id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: file.name,
+          type: fileType,
+          url: URL.createObjectURL(file),
+          dateUploaded: new Date().toISOString(),
+          label: project.documents[0]?.label
+        };
+      });
     } else {
       // Handle Document[] input from session storage
       newDocuments = files;

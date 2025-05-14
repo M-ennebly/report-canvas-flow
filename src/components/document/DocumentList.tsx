@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileImage, Trash2, FileText } from "lucide-react";
+import { FileImage, Trash2, FileText, Image, Files } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 
@@ -23,11 +23,33 @@ const DocumentList: React.FC<DocumentListProps> = ({
 
   // Document type icons and colors
   const getDocumentTypeIcon = (type: string) => {
-    switch(type) {
+    switch(type.toLowerCase()) {
       case "pdf":
         return <div className="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">PDF</div>;
+      case "word":
+      case "doc":
+      case "docx":
+        return <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">DOC</div>;
+      case "excel":
+      case "xls":
+      case "xlsx":
+        return <div className="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">XLS</div>;
+      case "powerpoint":
+      case "ppt":
+      case "pptx":
+        return <div className="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">PPT</div>;
+      case "image":
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+        return <div className="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+          <Image className="h-4 w-4" />
+        </div>;
       default:
-        return <div className="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center">FILE</div>;
+        return <div className="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center flex-shrink-0">
+          <Files className="h-4 w-4" />
+        </div>;
     }
   };
 
@@ -38,6 +60,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
   const handleConfirmDelete = () => {
     if (documentToDelete && onDocumentDelete) {
       onDocumentDelete(documentToDelete);
+      setDocumentToDelete(null);
     }
   };
 
@@ -61,12 +84,12 @@ const DocumentList: React.FC<DocumentListProps> = ({
               <div className="ml-3 overflow-hidden">
                 <p className="truncate font-medium text-slate-700">{doc.name}</p>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {new Date().toLocaleDateString()} • {Math.round(Math.random() * 10) + 1} pages
+                  {new Date(doc.dateUploaded).toLocaleDateString()} • {doc.type.toUpperCase()}
                 </p>
               </div>
             </div>
             <div className="flex space-x-1 ml-2">
-              {onExtractFigures && (
+              {onExtractFigures && doc.type.toLowerCase() !== "image" && (
                 <Button 
                   variant="ghost" 
                   size="sm"
