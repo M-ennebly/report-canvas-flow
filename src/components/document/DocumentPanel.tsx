@@ -111,14 +111,14 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
         <div className="p-4">
           <h3 className="text-sm font-medium mb-3">Linked Report</h3>
           <Select
-            value={project.linkedReportId || ""}
+            value={project.linkedReportId || "none"}
             onValueChange={onLinkedReportChange}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a report" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">None</SelectItem>
+              <SelectItem value="none">None</SelectItem>
               {availableReports.map((report) => (
                 <SelectItem key={report.id} value={report.id}>
                   {report.name}

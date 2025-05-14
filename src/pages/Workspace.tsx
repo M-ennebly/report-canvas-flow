@@ -126,7 +126,7 @@ const Workspace = () => {
   const handleLinkedReportChange = (reportId: string) => {
     setProject({
       ...project,
-      linkedReportId: reportId || undefined,
+      linkedReportId: reportId === "none" ? undefined : reportId,
     });
   };
 
