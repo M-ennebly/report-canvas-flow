@@ -29,9 +29,9 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className={`h-full bg-white flex flex-col transition-all duration-300 ${isOpen ? 'border-r' : ''}`}>
+    <div className="h-full flex flex-col">
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="flex h-full">
-        <div className={`flex-1 flex flex-col ${isOpen ? '' : 'hidden'}`}>
+        <div className={`flex-1 flex flex-col overflow-hidden bg-white ${isOpen ? 'border-r' : ''}`}>
           <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center">
               <FolderOpen className="mr-2 h-5 w-5 text-blue-500" />
@@ -44,7 +44,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
             </CollapsibleTrigger>
           </div>
           
-          <div className="flex-1 overflow-y-auto flex flex-col">
+          <CollapsibleContent className="flex-1 overflow-y-auto flex flex-col">
             {/* Document Uploader Section */}
             <div className="p-4 border-b">
               <h3 className="text-sm font-medium mb-3 flex items-center">
@@ -97,16 +97,17 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </div>
+          </CollapsibleContent>
         </div>
         
         {/* Collapsed state button */}
         {!isOpen && (
-          <CollapsibleTrigger asChild>
-            <button className="h-full w-10 border-r flex items-center justify-center hover:bg-slate-100">
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </CollapsibleTrigger>
+          <button 
+            className="h-full w-10 border-r flex items-center justify-center hover:bg-slate-100"
+            onClick={() => setIsOpen(true)}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         )}
       </Collapsible>
     </div>
