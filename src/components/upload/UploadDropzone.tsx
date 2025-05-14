@@ -29,11 +29,11 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
         }`}
       >
         <FileUp className={`mx-auto ${height === "normal" ? "h-12 w-12" : "h-8 w-8"} text-slate-400`} />
-        <p className="text-slate-500">Upload PDF, DOCX or PPT files</p>
+        <p className="text-slate-500">Upload PDF files only</p>
         <label>
           <input
             type="file"
-            accept=".pdf,.docx,.doc,.ppt,.pptx"
+            accept=".pdf"
             multiple
             className="hidden"
             onChange={handleFileUpload}

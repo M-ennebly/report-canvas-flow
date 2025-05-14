@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Document, Project } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -53,10 +52,6 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
     switch(type) {
       case "pdf":
         return <div className="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">PDF</div>;
-      case "docx":
-        return <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">DOC</div>;
-      case "ppt":
-        return <div className="w-8 h-8 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center">PPT</div>;
       default:
         return <div className="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center">FILE</div>;
     }
@@ -90,11 +85,11 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
             <div className="bg-blue-50 p-3 inline-flex rounded-full">
               <FileUp className="h-6 w-6 text-blue-500" />
             </div>
-            <p className="text-sm text-slate-600">Upload PDF, DOCX or PPT files</p>
+            <p className="text-sm text-slate-600">Upload PDF files only</p>
             <label>
               <Input 
                 type="file"
-                accept=".pdf,.docx,.doc,.ppt,.pptx"
+                accept=".pdf"
                 multiple
                 className="hidden"
                 onChange={handleFileUpload}

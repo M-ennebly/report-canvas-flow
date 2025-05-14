@@ -29,7 +29,7 @@ const BulkUploadTab: React.FC<BulkUploadTabProps> = ({
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold text-slate-800">Upload Multiple Documents</h2>
       <p className="text-slate-600">
-        Upload documents and extract figures across all workflow stages
+        Upload PDF documents and extract figures across all workflow stages
       </p>
       
       <UploadDropzone 
