@@ -55,10 +55,10 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     }
 
     // Execute save logic
-    const saveSuccess = handleSave();
+    const saveResult = handleSave();
     
     // Only close the modal if save was successful
-    if (saveSuccess) {
+    if (saveResult) {
       onClose();
     }
   };

@@ -153,7 +153,7 @@ export function useDocumentPreview(
     }
   };
 
-  const handleSave = () => {
+  const handleSave = (): boolean => {
     // Validate figures have titles
     const { valid, index } = validateFigures(croppedFigures);
     if (!valid) {

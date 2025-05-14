@@ -36,5 +36,5 @@ export interface UseDocumentPreviewReturn {
   handleCancelCrop: () => void;
   handleFigureChange: (id: string, field: 'title' | 'description' | 'label', value: string) => void;
   handleDeleteFigure: (id: string) => void;
-  handleSave: () => void;
+  handleSave: () => boolean;
 }
