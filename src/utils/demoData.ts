@@ -1,61 +1,114 @@
 
 import { Task } from "@/types";
 
-// Helper function to get a weighted distribution of tasks for each column
+// Sample image URLs for figures
+const figureImages = [
+  "/placeholder.svg",
+  "https://source.unsplash.com/random/800x600/?chart",
+  "https://source.unsplash.com/random/800x600/?graph",
+  "https://source.unsplash.com/random/800x600/?diagram",
+  "https://source.unsplash.com/random/800x600/?data"
+];
+
+// Task titles by category
+const taskTitles = {
+  design: [
+    "Design the user flow for mobile app",
+    "Create wireframes for dashboard",
+    "Visual design for landing page",
+    "UI component system design"
+  ],
+  analyse: [
+    "Market growth analysis",
+    "Customer segmentation report",
+    "Competitive landscape review",
+    "ROI analysis for product features"
+  ],
+  dev: [
+    "Implement authentication system",
+    "Build analytics dashboard",
+    "Create API integration layer",
+    "Develop mobile notification service"
+  ],
+  testing: [
+    "User acceptance test plan",
+    "Performance benchmarking",
+    "Security vulnerability assessment",
+    "Cross-platform compatibility testing"
+  ]
+};
+
+// Figure titles by category
+const figureTitles = {
+  design: [
+    "User Flow Diagram", 
+    "Wireframe Layout", 
+    "Color Scheme Palette", 
+    "Component Library"
+  ],
+  analyse: [
+    "Market Share Graph", 
+    "Customer Demographics", 
+    "Competitor Comparison", 
+    "Trend Analysis Chart"
+  ],
+  dev: [
+    "System Architecture", 
+    "Database Schema", 
+    "API Endpoints", 
+    "Service Integration Map"
+  ],
+  testing: [
+    "Test Coverage Report", 
+    "Performance Metrics", 
+    "Error Rate Analysis", 
+    "User Feedback Summary"
+  ]
+};
+
+// Generate demo tasks based on the selected labels
 export const generateDemoTasks = (
-  focusLabel?: string,
+  labelId?: string, 
   selectedLabels: string[] = []
 ): Task[] => {
-  // Default distribution if no specific label is targeted
-  let columnWeights = {
-    design: 0.25,
-    analyse: 0.25,
-    dev: 0.25,
-    testing: 0.25,
-  };
-
-  // If we have a specific label focus, adjust weights
-  if (focusLabel) {
-    const focusWeight = 0.5; // 50% of tasks in the focus column
-    const otherWeight = (1 - focusWeight) / 3; // Distribute the rest
-
-    columnWeights = {
-      design: focusLabel === "design" ? focusWeight : otherWeight,
-      analyse: focusLabel === "analyse" ? focusWeight : otherWeight,
-      dev: focusLabel === "dev" ? focusWeight : otherWeight,
-      testing: focusLabel === "testing" ? focusWeight : otherWeight,
-    };
-  } 
-  // If multiple labels are selected, distribute tasks among them
-  else if (selectedLabels && selectedLabels.length > 0) {
-    const focusWeight = 0.8; // 80% of tasks in the selected columns
-    const selectedWeight = focusWeight / selectedLabels.length; // Evenly distribute among selected
-    const otherWeight = (1 - focusWeight) / (4 - selectedLabels.length); // Rest for other columns
-
-    columnWeights = {
-      design: selectedLabels.includes("design") ? selectedWeight : otherWeight,
-      analyse: selectedLabels.includes("analyse") ? selectedWeight : otherWeight,
-      dev: selectedLabels.includes("dev") ? selectedWeight : otherWeight,
-      testing: selectedLabels.includes("testing") ? selectedWeight : otherWeight,
-    };
-  }
-
-  // Generate demo tasks with appropriate distribution
   const tasks: Task[] = [];
-  const taskTypes = ["table", "chart", "diagram", "image"];
-  const totalTasks = 16; // Total number of tasks to generate
+  const columns = labelId 
+    ? [labelId] 
+    : selectedLabels.length > 0 
+      ? selectedLabels 
+      : ["design", "analyse", "dev", "testing"];
 
-  Object.entries(columnWeights).forEach(([column, weight]) => {
-    const columnCount = Math.round(totalTasks * weight);
+  columns.forEach(column => {
+    // Generate 1-3 tasks per column
+    const taskCount = Math.floor(Math.random() * 3) + 1;
     
-    for (let i = 0; i < columnCount; i++) {
-      const taskType = taskTypes[Math.floor(Math.random() * taskTypes.length)];
-      const taskId = `task-${column}-${i}`;
+    for (let i = 0; i < taskCount; i++) {
+      // Get a random title for this column type
+      const titles = taskTitles[column as keyof typeof taskTitles];
+      const title = titles[Math.floor(Math.random() * titles.length)];
       
+      // Generate a random figure count (1-4)
+      const figureCount = Math.floor(Math.random() * 4) + 1;
+      const figures = [];
+      
+      // Create figures for this task
+      for (let j = 0; j < figureCount; j++) {
+        const figureTitle = figureTitles[column as keyof typeof figureTitles][j % 4];
+        
+        figures.push({
+          id: `figure-${column}-${i}-${j}`,
+          title: figureTitle,
+          description: `Description for ${figureTitle}`,
+          imageUrl: figureImages[Math.floor(Math.random() * figureImages.length)],
+          pageNumber: Math.floor(Math.random() * 20) + 1,
+        });
+      }
+      
+      const taskId = `task-${column}-${i}`;
       tasks.push({
         id: taskId,
-        title: `${taskType.charAt(0).toUpperCase() + taskType.slice(1)} ${i + 1}`,
-        figures: [],  // Empty figures array as per Task interface
+        title: title,
+        figures: figures,
         column: column as "design" | "analyse" | "dev" | "testing",
       });
     }
