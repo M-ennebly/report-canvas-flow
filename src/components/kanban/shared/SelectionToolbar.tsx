@@ -53,6 +53,15 @@ const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
     ? "bg-white border-t shadow-lg p-4 flex items-center justify-between z-50"
     : "bg-white border shadow-lg p-3 rounded-lg z-50";
   
+  // Helper to get selection count text
+  const getSelectionCountText = () => {
+    if (selectedItems.tasks.length > 0) {
+      return `${selectedItems.tasks.length} task${selectedItems.tasks.length === 1 ? '' : 's'} selected`;
+    } else {
+      return `${selectedItems.figures.length} figure${selectedItems.figures.length === 1 ? '' : 's'} selected`;
+    }
+  };
+  
   return (
     <div 
       className={`${containerClass} ${className}`}
@@ -61,19 +70,13 @@ const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
       <div className={position === "fixed" ? "flex items-center" : "flex flex-wrap gap-2 justify-center"}>
         {position === "fixed" && (
           <span className="text-sm font-medium mr-3">
-            {selectedItems.tasks.length > 0 ? 
-              `${selectedItems.tasks.length} task(s) selected` : 
-              `${selectedItems.figures.length} figure(s) selected`
-            }
+            {getSelectionCountText()}
           </span>
         )}
         
         {position !== "fixed" && (
           <span className="text-xs font-medium mr-1 whitespace-nowrap">
-            {selectedItems.tasks.length > 0 ? 
-              `${selectedItems.tasks.length} task(s) selected` : 
-              `${selectedItems.figures.length} figure(s) selected`
-            }
+            {getSelectionCountText()}
           </span>
         )}
         
@@ -84,7 +87,7 @@ const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
                 key={column.id}
                 variant="outline" 
                 size={position === "fixed" ? "sm" : "sm"}
-                className={position === "fixed" ? "" : "text-xs px-2 py-1 h-auto"}
+                className={position === "fixed" ? "mr-1" : "text-xs px-2 py-1 h-auto"}
                 onClick={() => onMoveToColumn(column.id)}
               >
                 Move to {column.title}
@@ -94,7 +97,7 @@ const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
               <Button 
                 variant="destructive" 
                 size={position === "fixed" ? "sm" : "sm"}
-                className={position === "fixed" ? "" : "text-xs px-2 py-1 h-auto"}
+                className={position === "fixed" ? "mr-1" : "text-xs px-2 py-1 h-auto"}
                 onClick={onDelete}
               >
                 Delete
