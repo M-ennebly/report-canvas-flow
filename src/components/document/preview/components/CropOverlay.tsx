@@ -20,9 +20,11 @@ const CropOverlay: React.FC<CropOverlayProps> = ({
   onMouseUp,
   onMouseLeave,
 }) => {
+  if (!croppingMode) return null;
+  
   return (
     <div 
-      className="absolute top-0 left-0 w-full h-full"
+      className="absolute top-0 left-0 w-full h-full z-10"
       style={{ cursor: croppingMode ? 'crosshair' : 'default' }}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
@@ -31,7 +33,7 @@ const CropOverlay: React.FC<CropOverlayProps> = ({
     >
       {cropStart && cropEnd && (
         <div
-          className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
+          className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none"
           style={{
             left: Math.min(cropStart.x, cropEnd.x),
             top: Math.min(cropStart.y, cropEnd.y),

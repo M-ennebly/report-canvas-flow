@@ -1,6 +1,6 @@
 
 import { CroppedFigure } from "./types";
-import { toast } from "@/components/ui/use-toast"; 
+import { toast } from "@/hooks/use-toast"; 
 
 /**
  * Returns utility functions for managing figures

@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { CropCoordinates } from "./types";
 import { toast } from "@/hooks/use-toast";
 import { Document } from "@/types";
@@ -27,7 +27,7 @@ export function useCroppingState(
   const [cropEnd, setCropEnd] = useState<CropCoordinates | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
-  const handleStartCrop = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleStartCrop = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!croppingMode) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -36,9 +36,10 @@ export function useCroppingState(
     
     setCropStart({ x, y });
     setCropEnd({ x, y });
-  };
+    console.log("Crop started at", { x, y });
+  }, [croppingMode]);
 
-  const handleCropMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleCropMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!croppingMode || !cropStart) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
@@ -46,14 +47,16 @@ export function useCroppingState(
     const y = Math.min(Math.max(e.clientY - rect.top, 0), rect.height);
     
     setCropEnd({ x, y });
-  };
+  }, [croppingMode, cropStart]);
 
-  const handleEndCrop = () => {
+  const handleEndCrop = useCallback(() => {
     if (!croppingMode || !cropStart || !cropEnd || !document) {
       setCropStart(null);
       setCropEnd(null);
       return;
     }
+    
+    console.log("Crop completed:", { cropStart, cropEnd, document });
     
     // Skip if area is too small
     if (Math.abs(cropEnd.x - cropStart.x) < 20 || Math.abs(cropEnd.y - cropStart.y) < 20) {
@@ -83,6 +86,7 @@ export function useCroppingState(
           cropHeight,
           document?.url
         );
+        console.log("Created cropped image URL:", croppedImageUrl.substring(0, 50) + "...");
       } catch (error) {
         console.error("Error cropping image:", error);
         toast({
@@ -105,6 +109,7 @@ export function useCroppingState(
     
     // Create a new figure with the cropped image
     const { id, figure } = createFigureFromCrop(document, croppedImageUrl);
+    console.log("Created new figure:", figure);
     addFigure(figure);
     
     // Reset crop state
@@ -116,13 +121,14 @@ export function useCroppingState(
       title: "Area selected!",
       description: "Add details to your figure.",
     });
-  };
+  }, [croppingMode, cropStart, cropEnd, document, isImage, addFigure]);
 
-  const handleCancelCrop = () => {
+  const handleCancelCrop = useCallback(() => {
+    console.log("Crop canceled");
     setCropStart(null);
     setCropEnd(null);
     setCroppingMode(false);
-  };
+  }, []);
 
   return {
     croppingMode,

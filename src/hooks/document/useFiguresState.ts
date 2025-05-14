@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { CroppedFigure } from "./types";
 import { Document } from "@/types";
 import { useFigureUtils } from "./figureUtils";
@@ -23,7 +23,10 @@ export function useFiguresState(
   const [activeFigureId, setActiveFigureId] = useState<string | null>(null);
 
   // Reset state when document changes
-  // We removed the useEffect hook that was causing issues
+  useEffect(() => {
+    setCroppedFigures([]);
+    setActiveFigureId(null);
+  }, [document?.id]);
   
   const { 
     validateFigures, 
@@ -45,6 +48,7 @@ export function useFiguresState(
   }, [deleteFigure]);
 
   const addFigure = useCallback((figure: CroppedFigure) => {
+    console.log("Adding new figure:", figure);
     setCroppedFigures(prev => [...prev, figure]);
     setActiveFigureId(figure.id);
   }, []);
@@ -60,6 +64,7 @@ export function useFiguresState(
       }
 
       if (onSaveFigures) {
+        console.log("Saving figures:", croppedFigures);
         onSaveFigures(croppedFigures);
       }
       
