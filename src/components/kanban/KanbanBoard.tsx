@@ -1,12 +1,11 @@
 
 import React, { useState } from "react";
 import { Task } from "@/types";
-import Column from "./Column";
+import KanbanView from "./KanbanView";
 import ListView from "./ListView";
 import TreeView from "./TreeView";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Kanban, List, FolderTree } from "lucide-react";
+import ViewSwitcher from "./ViewSwitcher";
+import ActionToolbar from "./ActionToolbar";
 
 interface KanbanBoardProps {
   tasks: Task[];
@@ -64,10 +63,6 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
     setSourceColumn(null);
   };
 
-  const getTasksByColumn = (columnId: string) => {
-    return tasks.filter(task => task.column === columnId);
-  };
-  
   // Handle selection of items (tasks or figures)
   const handleSelectItems = (items: {tasks: string[], figures: {taskId: string, figureId: string}[]}) => {
     setSelectedItems(items);
@@ -83,8 +78,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           onTaskMove(taskId, task.column, targetColumn);
         }
       });
-      setSelectedItems({tasks: [], figures: []});
-      setShowActionToolbar(false);
+      clearSelection();
     }
   };
   
@@ -94,47 +88,40 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       selectedItems.tasks.forEach(taskId => {
         onTaskDelete(taskId);
       });
-      setSelectedItems({tasks: [], figures: []});
-      setShowActionToolbar(false);
+      clearSelection();
     }
+  };
+
+  // Clear selection and hide toolbar
+  const clearSelection = () => {
+    setSelectedItems({tasks: [], figures: []});
+    setShowActionToolbar(false);
+  };
+
+  // Handle view mode changes
+  const handleViewModeChange = (mode: "kanban" | "list" | "tree") => {
+    setViewMode(mode);
+    // Clear any selections when changing views
+    clearSelection();
   };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2">
         <h2 className="text-xl font-semibold">Project Tasks & Figures</h2>
-        
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "kanban" | "list" | "tree")} className="mt-2 md:mt-0">
-          <TabsList>
-            <TabsTrigger value="kanban">
-              <Kanban className="h-4 w-4 mr-1" /> Kanban
-            </TabsTrigger>
-            <TabsTrigger value="list">
-              <List className="h-4 w-4 mr-1" /> List
-            </TabsTrigger>
-            <TabsTrigger value="tree">
-              <FolderTree className="h-4 w-4 mr-1" /> Tree
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        <ViewSwitcher viewMode={viewMode} onViewChange={handleViewModeChange} />
       </div>
 
       {viewMode === "kanban" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {columns.map((column) => (
-            <Column
-              key={column.id}
-              title={column.title}
-              tasks={getTasksByColumn(column.id)}
-              columnId={column.id}
-              onTaskClick={onTaskClick}
-              onTaskDelete={onTaskDelete}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            />
-          ))}
-        </div>
+        <KanbanView
+          tasks={tasks}
+          columns={columns}
+          onTaskClick={onTaskClick}
+          onTaskDelete={onTaskDelete}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        />
       )}
       
       {viewMode === "list" && (
@@ -155,52 +142,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         />
       )}
       
-      {/* Action Toolbar - Only show in Kanban and List views */}
-      {showActionToolbar && viewMode !== "tree" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 flex items-center justify-between z-50">
-          <div className="flex items-center">
-            <span className="text-sm font-medium mr-3">
-              {selectedItems.tasks.length > 0 ? 
-                `${selectedItems.tasks.length} task(s) selected` : 
-                `${selectedItems.figures.length} figure(s) selected`
-              }
-            </span>
-          </div>
-          <div className="flex space-x-2">
-            {selectedItems.tasks.length > 0 && (
-              <>
-                {columns.map((column) => (
-                  <Button 
-                    key={column.id}
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleBulkMoveTasksToColumn(column.id)}
-                  >
-                    Move to {column.title}
-                  </Button>
-                ))}
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={handleBulkDeleteTasks}
-                >
-                  Delete
-                </Button>
-              </>
-            )}
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                setSelectedItems({tasks: [], figures: []});
-                setShowActionToolbar(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )}
+      <ActionToolbar
+        selectedItems={selectedItems}
+        showActionToolbar={showActionToolbar}
+        viewMode={viewMode}
+        columns={columns}
+        onBulkMoveTasksToColumn={handleBulkMoveTasksToColumn}
+        onBulkDeleteTasks={handleBulkDeleteTasks}
+        onCancelSelection={clearSelection}
+      />
     </div>
   );
 };
