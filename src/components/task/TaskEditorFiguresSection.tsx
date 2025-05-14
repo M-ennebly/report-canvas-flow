@@ -1,28 +1,24 @@
 
 import React from "react";
-import { Figure } from "@/types";
 import TaskEditorFigure from "./TaskEditorFigure";
 import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
+import { useTaskEditorSidebar } from "./TaskEditorSidebarContext";
 
-interface TaskEditorFiguresSectionProps {
-  figures: Figure[];
-  collapsedFigures: Record<string, boolean>;
-  onToggleFigureCollapse: (figureId: string) => void;
-  onFigureTitleChange: (figureId: string, value: string) => void;
-  onFigureDescriptionChange: (figureId: string, value: string) => void;
-  onDeleteFigure: (figureId: string) => void;
-  onReorderFigures?: (reorderedFigures: Figure[]) => void;
-}
+const TaskEditorFiguresSection: React.FC = () => {
+  const { 
+    editedTask, 
+    collapsedFigures, 
+    handleReorderFigures,
+    toggleFigureCollapse,
+    handleFigureTitleChange,
+    handleFigureDescriptionChange,
+    handleDeleteFigure
+  } = useTaskEditorSidebar();
 
-const TaskEditorFiguresSection: React.FC<TaskEditorFiguresSectionProps> = ({
-  figures,
-  collapsedFigures,
-  onToggleFigureCollapse,
-  onFigureTitleChange,
-  onFigureDescriptionChange,
-  onDeleteFigure,
-  onReorderFigures,
-}) => {
+  if (!editedTask) return null;
+
+  const figures = editedTask.figures;
+
   const handleDragEnd = (result: DropResult) => {
     // If dropped outside the list or no movement
     if (!result.destination || result.destination.index === result.source.index) {
@@ -35,9 +31,7 @@ const TaskEditorFiguresSection: React.FC<TaskEditorFiguresSectionProps> = ({
     reorderedFigures.splice(result.destination.index, 0, removed);
 
     // Update the parent component with new order
-    if (onReorderFigures) {
-      onReorderFigures(reorderedFigures);
-    }
+    handleReorderFigures(reorderedFigures);
   };
 
   return (
@@ -77,10 +71,10 @@ const TaskEditorFiguresSection: React.FC<TaskEditorFiguresSectionProps> = ({
                             figure={figure}
                             index={index}
                             isCollapsed={!!collapsedFigures[figure.id]}
-                            onToggleCollapse={() => onToggleFigureCollapse(figure.id)}
-                            onTitleChange={(value) => onFigureTitleChange(figure.id, value)}
-                            onDescriptionChange={(value) => onFigureDescriptionChange(figure.id, value)}
-                            onDelete={() => onDeleteFigure(figure.id)}
+                            onToggleCollapse={() => toggleFigureCollapse(figure.id)}
+                            onTitleChange={(value) => handleFigureTitleChange(figure.id, value)}
+                            onDescriptionChange={(value) => handleFigureDescriptionChange(figure.id, value)}
+                            onDelete={() => handleDeleteFigure(figure.id)}
                             dragHandleProps={provided.dragHandleProps}
                           />
                         </div>

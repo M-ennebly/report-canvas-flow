@@ -2,18 +2,19 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { useTaskEditorSidebar } from "./TaskEditorSidebarContext";
 
 interface TaskEditorHeaderProps {
   title: string;
   colorClass: string;
-  onClose: () => void;
 }
 
 const TaskEditorHeader: React.FC<TaskEditorHeaderProps> = ({
   title,
-  colorClass,
-  onClose
+  colorClass
 }) => {
+  const { onClose } = useTaskEditorSidebar();
+  
   return (
     <div className={`p-4 ${colorClass} text-white flex items-center justify-between`}>
       <h2 className="text-xl font-semibold flex items-center">{title}</h2>

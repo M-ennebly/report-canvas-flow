@@ -1,20 +1,14 @@
 
 import React from "react";
-import { Task } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTaskEditorSidebar } from "./TaskEditorSidebarContext";
 
-interface TaskEditorFormProps {
-  task: Task;
-  onTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onColumnChange: (value: string) => void;
-}
+const TaskEditorForm: React.FC = () => {
+  const { editedTask, handleTitleChange, handleColumnChange } = useTaskEditorSidebar();
+  
+  if (!editedTask) return null;
 
-const TaskEditorForm: React.FC<TaskEditorFormProps> = ({
-  task,
-  onTitleChange,
-  onColumnChange,
-}) => {
   // Column display names
   const columnNames = {
     design: "Design",
@@ -28,8 +22,8 @@ const TaskEditorForm: React.FC<TaskEditorFormProps> = ({
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Task Title</label>
         <Input
-          value={task.title}
-          onChange={onTitleChange}
+          value={editedTask.title}
+          onChange={handleTitleChange}
           className="border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
           placeholder="Enter task title"
         />
@@ -38,8 +32,8 @@ const TaskEditorForm: React.FC<TaskEditorFormProps> = ({
       <div className="space-y-2">
         <label className="text-sm font-medium text-gray-700">Task Column/Label</label>
         <Select
-          value={task.column}
-          onValueChange={onColumnChange}
+          value={editedTask.column}
+          onValueChange={handleColumnChange}
         >
           <SelectTrigger className="w-full border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <SelectValue placeholder="Select column" />
