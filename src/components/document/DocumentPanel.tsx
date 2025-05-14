@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FileUp } from "lucide-react";
+import { FileUp, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface DocumentPanelProps {
@@ -13,6 +13,7 @@ interface DocumentPanelProps {
   onDescriptionChange: (description: string) => void;
   onLinkedReportChange: (reportId: string) => void;
   onDocumentUpload: (files: FileList) => void;
+  onDocumentDelete?: (documentId: string) => void;
 }
 
 const DocumentPanel: React.FC<DocumentPanelProps> = ({
@@ -20,6 +21,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   onDescriptionChange,
   onLinkedReportChange,
   onDocumentUpload,
+  onDocumentDelete,
 }) => {
   const [description, setDescription] = useState(project.description || "");
 
@@ -35,6 +37,13 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
       e.target.value = ""; // Reset input
     }
   };
+
+  const handleDeleteDocument = (documentId: string) => {
+    if (onDocumentDelete) {
+      onDocumentDelete(documentId);
+      toast.success("Document deleted");
+    }
+  };
   
   // For demo purposes only
   const availableReports = [
@@ -44,7 +53,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   ];
 
   return (
-    <div className="h-full bg-white border-l flex flex-col">
+    <div className="h-full bg-white border-r flex flex-col">
       <div className="p-4 border-b">
         <h2 className="text-lg font-semibold">Project Details</h2>
       </div>
@@ -79,17 +88,30 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
           
           {project.documents.length > 0 && (
             <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
+              <h4 className="text-xs uppercase font-medium text-slate-500">Uploaded files</h4>
               {project.documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center p-2 text-sm rounded-md hover:bg-slate-50"
+                  className="flex items-center justify-between p-2 text-sm rounded-md hover:bg-slate-50 border border-slate-100"
                 >
-                  <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2">
-                    {doc.type === "pdf" ? "PDF" : doc.type === "docx" ? "DOC" : "PPT"}
+                  <div className="flex items-center flex-1">
+                    <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2">
+                      {doc.type === "pdf" ? "PDF" : doc.type === "docx" ? "DOC" : "PPT"}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="truncate">{doc.name}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="truncate">{doc.name}</p>
-                  </div>
+                  {onDocumentDelete && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleDeleteDocument(doc.id)}
+                      className="text-slate-500 hover:text-red-500"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

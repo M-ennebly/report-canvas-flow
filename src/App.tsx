@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import LabelUpload from "./pages/LabelUpload";
 import Workspace from "./pages/Workspace";
+import ReportPage from "./pages/ReportPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/label-upload" element={<LabelUpload />} />
           <Route path="/workspace/bulk" element={<Workspace />} />
           <Route path="/workspace/label/:labelId" element={<Workspace />} />
+          <Route path="/report/:projectId" element={<ReportPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

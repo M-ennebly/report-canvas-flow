@@ -3,12 +3,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, X } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Check, FileUp, X } from "lucide-react";
 import { toast } from "sonner";
 
 const LabelUpload = () => {
   const navigate = useNavigate();
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
 
   const labels = [
     { id: "design", name: "Design", color: "bg-kanban-design" },
@@ -19,19 +22,33 @@ const LabelUpload = () => {
 
   const handleLabelSelect = (labelId: string) => {
     setSelectedLabel(labelId);
+    setIsDialogOpen(true);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setHasUploadedFiles(true);
+      toast.success(`${e.target.files.length} document(s) selected`);
+    }
+  };
+  
   const handleUpload = () => {
     if (!selectedLabel) {
       toast.error("Please select a label first");
       return;
     }
     
-    // In a real application, we would handle file uploads here
+    // In a real application, we would handle the file upload here
     toast.success("Files uploaded successfully");
     
     // Redirect to workspace with the selected label
     navigate(`/workspace/label/${selectedLabel}`);
+  };
+
+  const handleCancel = () => {
+    setSelectedLabel(null);
+    setIsDialogOpen(false);
+    setHasUploadedFiles(false);
   };
 
   return (
@@ -74,18 +91,53 @@ const LabelUpload = () => {
                 </div>
               ))}
             </div>
-            
-            <div className="mt-8 flex justify-end">
-              <Button 
-                disabled={!selectedLabel}
-                onClick={handleUpload}
-              >
-                Continue to Upload
-              </Button>
-            </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Upload Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload Documents to {labels.find(l => l.id === selectedLabel)?.name}</DialogTitle>
+            <DialogDescription>
+              The uploaded documents will be processed and figures will be added to the {labels.find(l => l.id === selectedLabel)?.name} column.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center space-y-2 my-4">
+            <FileUp className="mx-auto h-8 w-8 text-slate-400" />
+            <p className="text-slate-500">Upload PDF, DOCX or PPT files</p>
+            <label>
+              <input
+                type="file"
+                accept=".pdf,.docx,.doc,.ppt,.pptx"
+                multiple
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="mt-2 w-full"
+                asChild
+              >
+                <span>Select Files</span>
+              </Button>
+            </label>
+          </div>
+          
+          <DialogFooter className="flex flex-row justify-between">
+            <Button variant="outline" onClick={handleCancel}>Cancel</Button>
+            <Button 
+              onClick={handleUpload}
+              disabled={!hasUploadedFiles}
+            >
+              Upload and View Workspace
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

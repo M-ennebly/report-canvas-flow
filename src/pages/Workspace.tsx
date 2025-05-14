@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Figure, Task, Project } from "@/types";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import TaskEditorSidebar from "@/components/task/TaskEditorSidebar";
 import DocumentPanel from "@/components/document/DocumentPanel";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 const Workspace = () => {
@@ -145,6 +144,17 @@ const Workspace = () => {
       documents: [...project.documents, ...newDocuments],
     });
   };
+  
+  const handleDocumentDelete = (documentId: string) => {
+    setProject({
+      ...project,
+      documents: project.documents.filter(doc => doc.id !== documentId)
+    });
+  };
+  
+  const handleGenerateReport = () => {
+    navigate(`/report/${project.id}`);
+  };
 
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-slate-100">
@@ -159,7 +169,8 @@ const Workspace = () => {
             {project.name} {labelId && `- ${labelId.charAt(0).toUpperCase() + labelId.slice(1)}`}
           </h1>
         </div>
-        <Button>
+        <Button onClick={handleGenerateReport}>
+          <FileText className="h-4 w-4 mr-2" />
           Generate Project Report
         </Button>
       </header>
@@ -167,16 +178,13 @@ const Workspace = () => {
       {/* Main Content */}
       <div className="flex-grow flex overflow-hidden">
         {/* Left Document Panel */}
-        <div 
-          className={`w-80 lg:w-96 transition-transform duration-300 fixed md:relative left-0 top-16 md:top-0 bottom-0 z-40 md:z-auto md:translate-x-0 ${
-            isDocPanelOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
+        <div className="w-80 lg:w-96 hidden md:block bg-white border-r overflow-y-auto">
           <DocumentPanel
             project={project}
             onDescriptionChange={handleDescriptionChange}
             onLinkedReportChange={handleLinkedReportChange}
             onDocumentUpload={handleDocumentUpload}
+            onDocumentDelete={handleDocumentDelete}
           />
         </div>
 
@@ -189,19 +197,37 @@ const Workspace = () => {
           />
         </div>
 
+        {/* Mobile Document Panel for small screens */}
+        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300" 
+             style={{ display: isDocPanelOpen ? 'block' : 'none' }}
+             onClick={() => setIsDocPanelOpen(false)}>
+          <div 
+            className="w-11/12 h-full bg-white overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DocumentPanel
+              project={project}
+              onDescriptionChange={handleDescriptionChange}
+              onLinkedReportChange={handleLinkedReportChange}
+              onDocumentUpload={handleDocumentUpload}
+              onDocumentDelete={handleDocumentDelete}
+            />
+          </div>
+        </div>
+
         {/* Document Panel Toggle for Mobile */}
         <div className="md:hidden fixed bottom-4 left-4">
           <Button 
             variant="secondary"
-            onClick={() => setIsDocPanelOpen(!isDocPanelOpen)}
+            onClick={() => setIsDocPanelOpen(true)}
             className="rounded-full h-12 w-12 p-0 shadow-lg"
           >
-            {isDocPanelOpen ? <X className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+            <FileText className="h-5 w-5" />
           </Button>
         </div>
       </div>
 
-      {/* Task Editor Sidebar (now on the right) */}
+      {/* Task Editor Sidebar (on the right) */}
       <TaskEditorSidebar
         task={selectedTask}
         isOpen={isEditorOpen}

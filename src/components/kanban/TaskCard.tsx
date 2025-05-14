@@ -39,6 +39,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDragStart }) => {
                   alt={figure.title}
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-[10px] p-1 truncate">
+                  {figure.title}
+                </div>
               </div>
             ))}
           </div>
