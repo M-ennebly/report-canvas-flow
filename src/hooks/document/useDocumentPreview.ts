@@ -54,7 +54,7 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
     cropHeight: number
   ): string => {
     // Create a canvas element
-    const canvas = document.createElement('canvas');
+    const canvas = window.document.createElement('canvas');
     canvas.width = cropWidth;
     canvas.height = cropHeight;
     
