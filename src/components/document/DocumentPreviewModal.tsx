@@ -3,9 +3,9 @@ import React, { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Document } from "@/types";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
-// Import new componentized parts
+// Import componentized parts
 import FilePreview from "./preview/FilePreview";
 import CroppingToolbar from "./preview/CroppingToolbar";
 import FiguresList from "./preview/FiguresList";
@@ -33,6 +33,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   onClose,
   onSaveFigures,
 }) => {
+  const { toast } = useToast();
   const [croppingMode, setCroppingMode] = useState(false);
   const [cropStart, setCropStart] = useState<{ x: number; y: number } | null>(null);
   const [cropEnd, setCropEnd] = useState<{ x: number; y: number } | null>(null);
@@ -46,7 +47,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   const handleStartCrop = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!croppingMode || !previewRef.current) return;
     
-    const rect = previewRef.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
@@ -57,7 +58,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   const handleCropMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!croppingMode || !cropStart || !previewRef.current) return;
     
-    const rect = previewRef.current.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
     const y = Math.min(Math.max(e.clientY - rect.top, 0), rect.height);
     
@@ -66,6 +67,15 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
   const handleEndCrop = () => {
     if (!croppingMode || !cropStart || !cropEnd || !document) return;
+    
+    // Skip if area is too small
+    if (Math.abs(cropEnd.x - cropStart.x) < 20 || Math.abs(cropEnd.y - cropStart.y) < 20) {
+      toast({
+        description: "Selected area is too small. Please select a larger area.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // For a real implementation, we'd use canvas to crop the image
     // For this demo, we'll simulate it by capturing the coordinates
@@ -87,7 +97,10 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     setCropEnd(null);
     setCroppingMode(false);
     
-    toast.success("Area selected! Add details to your figure.");
+    toast({
+      title: "Area selected!",
+      description: "Add details to your figure.",
+    });
   };
 
   const handleCancelCrop = () => {
@@ -115,7 +128,11 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     // Validate figures have titles
     const incompleteIndex = croppedFigures.findIndex(fig => !fig.title.trim());
     if (incompleteIndex >= 0) {
-      toast.error("Please add a title to all figures");
+      toast({
+        title: "Missing title",
+        description: "Please add a title to all figures",
+        variant: "destructive"
+      });
       setActiveFigureId(croppedFigures[incompleteIndex].id);
       return;
     }
@@ -123,18 +140,23 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     if (onSaveFigures) {
       onSaveFigures(croppedFigures);
     }
-    toast.success(`${croppedFigures.length} figures saved successfully`);
+    toast({
+      title: "Figures saved",
+      description: `${croppedFigures.length} figures saved successfully`,
+    });
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[90%] max-h-[90vh] flex flex-col">
-        <DocumentPreviewHeader documentName={document?.name} />
+      <DialogContent className="sm:max-w-[90%] sm:w-[90%] max-h-[90vh] h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+        <div className="p-6 pb-2">
+          <DocumentPreviewHeader documentName={document?.name} />
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 pt-2 overflow-hidden flex-1">
           {/* Preview Panel - takes 2/3 width on desktop */}
-          <div className="md:col-span-2 h-full flex flex-col">
+          <div className="md:col-span-2 h-full flex flex-col" ref={previewRef}>
             <div className="flex justify-between items-center mb-2">
               <div className="text-sm text-slate-500">
                 {document?.type.toUpperCase()}
@@ -149,7 +171,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 onCompleteCrop={handleEndCrop}
               />
             </div>
-            <div className="flex-1 overflow-auto border rounded-md">
+            <div className="flex-1 overflow-hidden border rounded-md bg-slate-50">
               <FilePreview 
                 document={document}
                 croppingMode={croppingMode}
@@ -158,13 +180,13 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 onMouseDown={handleStartCrop}
                 onMouseMove={handleCropMove}
                 onMouseUp={handleEndCrop}
-                onMouseLeave={handleEndCrop}
+                onMouseLeave={handleCancelCrop}
               />
             </div>
           </div>
           
           {/* Figures Panel - takes 1/3 width on desktop */}
-          <div className="border rounded-md p-4 flex flex-col h-[400px] md:h-auto">
+          <div className="border rounded-md p-4 flex flex-col h-[400px] md:h-auto overflow-hidden bg-white">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium">Extracted Figures</h3>
               {croppedFigures.length > 0 && (
@@ -174,17 +196,19 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               )}
             </div>
             
-            <FiguresList 
-              figures={croppedFigures}
-              activeFigureId={activeFigureId}
-              onFigureChange={handleFigureChange}
-              onDeleteFigure={handleDeleteFigure}
-              onSelectFigure={setActiveFigureId}
-            />
+            <div className="flex-1 overflow-hidden">
+              <FiguresList 
+                figures={croppedFigures}
+                activeFigureId={activeFigureId}
+                onFigureChange={handleFigureChange}
+                onDeleteFigure={handleDeleteFigure}
+                onSelectFigure={setActiveFigureId}
+              />
+            </div>
           </div>
         </div>
 
-        <DialogFooter className="mt-4">
+        <DialogFooter className="p-6 pt-2 border-t bg-slate-50">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>

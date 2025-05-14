@@ -36,24 +36,24 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     return (
       <div 
         ref={previewRef}
-        className="relative w-full overflow-hidden bg-slate-100"
+        className="relative w-full h-full overflow-hidden bg-slate-100"
         style={{ cursor: croppingMode ? 'crosshair' : 'default' }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
-        onMouseLeave={cropStart ? onMouseLeave : undefined}
+        onMouseLeave={onMouseLeave}
       >
-        <AspectRatio ratio={16/9} className="bg-slate-100">
+        <div className="h-full w-full flex items-center justify-center">
           <img
             src={document.url}
             alt={document.name}
-            className="h-full w-full object-contain"
+            className="max-h-full max-w-full object-contain"
           />
-        </AspectRatio>
+        </div>
         
         {cropStart && cropEnd && (
           <div
-            className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none"
+            className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
             style={{
               left: Math.min(cropStart.x, cropEnd.x),
               top: Math.min(cropStart.y, cropEnd.y),
@@ -66,7 +66,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     );
   } else if (document.type === "pdf") {
     return (
-      <div className="w-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
+      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
         <div className="text-3xl font-bold text-red-500 mb-2">PDF</div>
         <p className="text-slate-600">{document.name}</p>
         <p className="mt-4 text-sm text-slate-500">Preview not available for PDF files.</p>
@@ -74,7 +74,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     );
   } else if (["doc", "docx", "word"].includes(document.type.toLowerCase())) {
     return (
-      <div className="w-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
+      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
         <div className="text-3xl font-bold text-blue-500 mb-2">DOCX</div>
         <p className="text-slate-600">{document.name}</p>
         <p className="mt-4 text-sm text-slate-500">Preview not available for Word documents.</p>
@@ -82,7 +82,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     );
   } else if (["ppt", "pptx", "powerpoint"].includes(document.type.toLowerCase())) {
     return (
-      <div className="w-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
+      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
         <div className="text-3xl font-bold text-orange-500 mb-2">PPT</div>
         <p className="text-slate-600">{document.name}</p>
         <p className="mt-4 text-sm text-slate-500">Preview not available for PowerPoint files.</p>
@@ -90,7 +90,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
     );
   } else {
     return (
-      <div className="w-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
+      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
         <div className="text-xl font-medium text-slate-600 mb-2">{document.type.toUpperCase()}</div>
         <p className="text-slate-600">{document.name}</p>
         <p className="mt-4 text-sm text-slate-500">Preview not available for this file type.</p>

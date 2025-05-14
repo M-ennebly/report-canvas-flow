@@ -57,8 +57,8 @@ const FiguresList: React.FC<FiguresListProps> = ({
   }
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="space-y-4">
+    <ScrollArea className="h-full w-full pr-4">
+      <div className="space-y-4 pb-4">
         {figures.map((figure) => (
           <div
             key={figure.id}
@@ -85,7 +85,10 @@ const FiguresList: React.FC<FiguresListProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onDeleteFigure(figure.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteFigure(figure.id);
+                }}
                 className="h-8 w-8 p-0 ml-2"
               >
                 <X className="h-4 w-4" />
@@ -103,6 +106,7 @@ const FiguresList: React.FC<FiguresListProps> = ({
                 onChange={(e) => onFigureChange(figure.id, 'description', e.target.value)}
                 className="mt-1 h-20"
                 placeholder="Add a description for this figure"
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
 
@@ -125,6 +129,7 @@ const FiguresList: React.FC<FiguresListProps> = ({
                     variant="outline" 
                     size="sm" 
                     className="w-full justify-between text-left font-normal"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-center">
                       {figure.label ? (
@@ -145,13 +150,14 @@ const FiguresList: React.FC<FiguresListProps> = ({
                     </div>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="p-0 w-56" align="start">
+                <PopoverContent className="p-0 w-56" align="start" onClick={(e) => e.stopPropagation()}>
                   <div className="py-2">
                     {workflowLabels.map((label) => (
                       <div
                         key={label.id}
                         className="flex items-center px-3 py-2 hover:bg-slate-100 cursor-pointer"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           onFigureChange(figure.id, 'label', label.id);
                           toast.success(`Figure assigned to ${label.name}`);
                         }}
