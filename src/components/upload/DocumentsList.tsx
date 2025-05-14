@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileImage, Trash2, Image, Files, MoreHorizontal } from "lucide-react";
+import { FileImage, Trash2, Image, Files, MoreHorizontal, Maximize } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
 import DocumentPreviewModal from "@/components/document/DocumentPreviewModal";
+import DocumentsGalleryModal from "@/components/document/DocumentsGalleryModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,7 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
 }) => {
   const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
   const [documentToPreview, setDocumentToPreview] = useState<Document | null>(null);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   
   if (documents.length === 0) return null;
   
@@ -82,7 +84,22 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
   
   return (
     <div className="mt-6 border rounded-md p-4 bg-white">
-      <h3 className="font-medium mb-2">Selected Documents:</h3>
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-medium">Selected Documents:</h3>
+        <div className="flex items-center">
+          <Badge variant="outline" className="mr-2">
+            {documents.length} document{documents.length !== 1 ? 's' : ''}
+          </Badge>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setGalleryOpen(true)}
+          >
+            <Maximize className="mr-1 h-3 w-3" />
+            View All
+          </Button>
+        </div>
+      </div>
       <ul className="space-y-2 max-h-60 overflow-y-auto">
         {documents.map(doc => (
           <li key={doc.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
@@ -158,6 +175,14 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
         isOpen={!!documentToPreview}
         onClose={() => setDocumentToPreview(null)}
         onSaveFigures={handleSaveFigures}
+      />
+      
+      {/* Documents Gallery Modal */}
+      <DocumentsGalleryModal
+        documents={documents}
+        isOpen={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        onExtractFigures={onExtractFigures}
       />
     </div>
   );

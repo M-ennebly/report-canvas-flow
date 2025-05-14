@@ -1,7 +1,7 @@
 
 import { useState, useRef } from "react";
 import { Document } from "@/types";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CroppedFigure {
   id: string;
@@ -21,6 +21,7 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
   const [activeFigureId, setActiveFigureId] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
+  // Determine if document is an image
   const isImage = document?.type.toLowerCase() === "image" || 
     ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(document?.type.toLowerCase() || "");
 
@@ -65,25 +66,39 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
       return document?.url || '';
     }
     
-    // Draw the cropped portion of the image onto the canvas
-    context.drawImage(
-      image,
-      cropStartX, 
-      cropStartY,
-      cropWidth, 
-      cropHeight,
-      0, 
-      0,
-      cropWidth, 
-      cropHeight
-    );
+    // Calculate the actual coordinates on the image
+    const imgRect = image.getBoundingClientRect();
+    const scaleX = image.naturalWidth / imgRect.width;
+    const scaleY = image.naturalHeight / imgRect.height;
     
-    // Convert the canvas to a data URL and return it
-    return canvas.toDataURL('image/png');
+    // Draw the cropped portion of the image onto the canvas
+    try {
+      context.drawImage(
+        image,
+        cropStartX * scaleX, 
+        cropStartY * scaleY,
+        cropWidth * scaleX, 
+        cropHeight * scaleY,
+        0, 
+        0,
+        cropWidth, 
+        cropHeight
+      );
+      
+      // Convert the canvas to a data URL and return it
+      return canvas.toDataURL('image/png');
+    } catch (err) {
+      console.error("Error cropping image:", err);
+      return document?.url || '';
+    }
   };
 
   const handleEndCrop = () => {
-    if (!croppingMode || !cropStart || !cropEnd || !document || !imgRef.current) return;
+    if (!croppingMode || !cropStart || !cropEnd || !document || !imgRef.current) {
+      setCropStart(null);
+      setCropEnd(null);
+      return;
+    }
     
     // Skip if area is too small
     if (Math.abs(cropEnd.x - cropStart.x) < 20 || Math.abs(cropEnd.y - cropStart.y) < 20) {
@@ -120,7 +135,7 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
       label: document.label // Inherit label from source document if available
     };
 
-    setCroppedFigures([...croppedFigures, newFigure]);
+    setCroppedFigures(prev => [...prev, newFigure]);
     setActiveFigureId(id);
     
     // Reset crop state

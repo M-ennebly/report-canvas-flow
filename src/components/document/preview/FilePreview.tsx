@@ -1,6 +1,6 @@
+
 import React, { useRef } from "react";
 import { Document } from "@/types";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FilePreviewProps {
@@ -37,35 +37,43 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   if (isImage) {
     return (
       <ScrollArea className="h-full w-full">
-        <div 
-          ref={previewRef}
-          className="relative min-h-full min-w-full overflow-visible bg-slate-100"
-          style={{ cursor: croppingMode ? 'crosshair' : 'default' }}
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseLeave}
-        >
-          <div className="p-4 flex items-center justify-center">
+        <div className="relative min-h-full min-w-full overflow-visible bg-slate-100">
+          <div 
+            ref={previewRef}
+            className="p-4 flex items-center justify-center"
+          >
             <img
               ref={imgRef}
               src={document.url}
               alt={document.name}
               className="max-w-full object-contain"
+              onLoad={() => {
+                // Ensure image is loaded before allowing cropping
+                console.log("Image loaded successfully");
+              }}
             />
           </div>
           
-          {cropStart && cropEnd && (
-            <div
-              className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
-              style={{
-                left: Math.min(cropStart.x, cropEnd.x),
-                top: Math.min(cropStart.y, cropEnd.y),
-                width: Math.abs(cropEnd.x - cropStart.x),
-                height: Math.abs(cropEnd.y - cropStart.y)
-              }}
-            />
-          )}
+          <div 
+            className="absolute top-0 left-0 w-full h-full"
+            style={{ cursor: croppingMode ? 'crosshair' : 'default' }}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseLeave}
+          >
+            {cropStart && cropEnd && (
+              <div
+                className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
+                style={{
+                  left: Math.min(cropStart.x, cropEnd.x),
+                  top: Math.min(cropStart.y, cropEnd.y),
+                  width: Math.abs(cropEnd.x - cropStart.x),
+                  height: Math.abs(cropEnd.y - cropStart.y)
+                }}
+              />
+            )}
+          </div>
         </div>
       </ScrollArea>
     );
