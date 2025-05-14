@@ -1,19 +1,29 @@
 
 import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Document } from "@/types";
-import { useToast } from "@/components/ui/use-toast";
+import { 
+  CroppedFigure, 
+  UseDocumentPreviewProps, 
+  UseDocumentPreviewReturn 
+} from "./types";
+import { cropImage, isDocumentImage, createFigureFromCrop } from "./cropUtils";
+import { useFigureUtils } from "./figureUtils";
 
-interface CroppedFigure {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  sourceDocumentId: string;
-  label?: string;
-}
-
-export function useDocumentPreview(document: Document | null, onSaveFigures?: (figures: CroppedFigure[]) => void) {
+export function useDocumentPreview({ 
+  document, 
+  onSaveFigures 
+}: UseDocumentPreviewProps): UseDocumentPreviewReturn {
   const { toast } = useToast();
+  const { 
+    validateFigures, 
+    showValidationError, 
+    showSaveSuccess,
+    updateFigureField,
+    deleteFigure
+  } = useFigureUtils();
+
+  // State management
   const [croppingMode, setCroppingMode] = useState(false);
   const [cropStart, setCropStart] = useState<{ x: number; y: number } | null>(null);
   const [cropEnd, setCropEnd] = useState<{ x: number; y: number } | null>(null);
@@ -22,8 +32,7 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
   const imgRef = useRef<HTMLImageElement | null>(null);
 
   // Determine if document is an image
-  const isImage = document?.type.toLowerCase() === "image" || 
-    ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(document?.type.toLowerCase() || "");
+  const isImage = isDocumentImage(document?.type);
 
   const handleStartCrop = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!croppingMode) return;
@@ -44,53 +53,6 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
     const y = Math.min(Math.max(e.clientY - rect.top, 0), rect.height);
     
     setCropEnd({ x, y });
-  };
-
-  // Generate a cropped image from the original image using canvas
-  const cropImage = (
-    image: HTMLImageElement, 
-    cropStartX: number, 
-    cropStartY: number,
-    cropWidth: number,
-    cropHeight: number
-  ): string => {
-    // Create a canvas element
-    const canvas = window.document.createElement('canvas');
-    canvas.width = cropWidth;
-    canvas.height = cropHeight;
-    
-    // Get the 2D context of the canvas
-    const context = canvas.getContext('2d');
-    if (!context) {
-      console.error("Failed to get canvas context");
-      return document?.url || '';
-    }
-    
-    // Calculate the actual coordinates on the image
-    const imgRect = image.getBoundingClientRect();
-    const scaleX = image.naturalWidth / imgRect.width;
-    const scaleY = image.naturalHeight / imgRect.height;
-    
-    // Draw the cropped portion of the image onto the canvas
-    try {
-      context.drawImage(
-        image,
-        cropStartX * scaleX, 
-        cropStartY * scaleY,
-        cropWidth * scaleX, 
-        cropHeight * scaleY,
-        0, 
-        0,
-        cropWidth, 
-        cropHeight
-      );
-      
-      // Convert the canvas to a data URL and return it
-      return canvas.toDataURL('image/png');
-    } catch (err) {
-      console.error("Error cropping image:", err);
-      return document?.url || '';
-    }
   };
 
   const handleEndCrop = () => {
@@ -121,21 +83,13 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
       cropStartX,
       cropStartY, 
       cropWidth,
-      cropHeight
+      cropHeight,
+      document?.url
     );
     
     // Create a new figure with the cropped image
-    const id = `figure-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newFigure: CroppedFigure = {
-      id,
-      title: `Figure from ${document.name}`,
-      description: "",
-      imageUrl: croppedImageUrl,
-      sourceDocumentId: document.id,
-      label: document.label // Inherit label from source document if available
-    };
-
-    setCroppedFigures(prev => [...prev, newFigure]);
+    const { id, figure } = createFigureFromCrop(document, croppedImageUrl);
+    setCroppedFigures(prev => [...prev, figure]);
     setActiveFigureId(id);
     
     // Reset crop state
@@ -156,15 +110,13 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
   };
 
   const handleFigureChange = (id: string, field: 'title' | 'description' | 'label', value: string) => {
-    setCroppedFigures(
-      croppedFigures.map((figure) =>
-        figure.id === id ? { ...figure, [field]: value } : figure
-      )
+    setCroppedFigures(currentFigures => 
+      updateFigureField(currentFigures, id, field, value)
     );
   };
 
   const handleDeleteFigure = (id: string) => {
-    setCroppedFigures(croppedFigures.filter((figure) => figure.id !== id));
+    setCroppedFigures(currentFigures => deleteFigure(currentFigures, id));
     if (activeFigureId === id) {
       setActiveFigureId(null);
     }
@@ -172,24 +124,18 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
 
   const handleSave = () => {
     // Validate figures have titles
-    const incompleteIndex = croppedFigures.findIndex(fig => !fig.title.trim());
-    if (incompleteIndex >= 0) {
-      toast({
-        title: "Missing title",
-        description: "Please add a title to all figures",
-        variant: "destructive"
-      });
-      setActiveFigureId(croppedFigures[incompleteIndex].id);
+    const { valid, index } = validateFigures(croppedFigures);
+    if (!valid) {
+      const figureId = showValidationError(index, croppedFigures);
+      setActiveFigureId(figureId);
       return;
     }
 
     if (onSaveFigures) {
       onSaveFigures(croppedFigures);
     }
-    toast({
-      title: "Figures saved",
-      description: `${croppedFigures.length} figures saved successfully`,
-    });
+    
+    showSaveSuccess(croppedFigures.length);
   };
 
   return {
@@ -212,4 +158,5 @@ export function useDocumentPreview(document: Document | null, onSaveFigures?: (f
   };
 }
 
+// Re-export the type for convenience
 export type { CroppedFigure };
