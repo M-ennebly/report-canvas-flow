@@ -84,6 +84,13 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
     }
   };
 
+  const handleReorderFigures = (reorderedFigures: Task["figures"]) => {
+    setEditedTask({
+      ...editedTask,
+      figures: reorderedFigures
+    });
+  };
+
   const handleSave = () => {
     onSave(editedTask);
     toast({
@@ -132,6 +139,7 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
               onFigureTitleChange={handleFigureTitleChange}
               onFigureDescriptionChange={handleFigureDescriptionChange}
               onDeleteFigure={handleDeleteFigure}
+              onReorderFigures={handleReorderFigures}
             />
           </div>
         </div>

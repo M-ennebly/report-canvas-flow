@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, GripVertical } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 
 interface TaskEditorFigureProps {
   figure: Figure;
@@ -16,6 +17,7 @@ interface TaskEditorFigureProps {
   onTitleChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onDelete: () => void;
+  dragHandleProps?: DraggableProvidedDragHandleProps;
 }
 
 const TaskEditorFigure: React.FC<TaskEditorFigureProps> = ({
@@ -25,7 +27,8 @@ const TaskEditorFigure: React.FC<TaskEditorFigureProps> = ({
   onToggleCollapse,
   onTitleChange,
   onDescriptionChange,
-  onDelete
+  onDelete,
+  dragHandleProps
 }) => {
   return (
     <Collapsible 
@@ -35,9 +38,14 @@ const TaskEditorFigure: React.FC<TaskEditorFigureProps> = ({
     >
       <CollapsibleTrigger className="w-full group">
         <div className="p-3 bg-white border-b flex justify-between items-center hover:bg-blue-50 transition-colors duration-200">
-          <h4 className="text-sm font-medium text-gray-800">
-            {figure.title || `Figure ${index + 1}`}
-          </h4>
+          <div className="flex items-center flex-1">
+            <div {...dragHandleProps} className="cursor-grab p-1 mr-2 hover:bg-gray-100 rounded">
+              <GripVertical className="h-4 w-4 text-gray-500" />
+            </div>
+            <h4 className="text-sm font-medium text-gray-800">
+              {figure.title || `Figure ${index + 1}`}
+            </h4>
+          </div>
           <div className="flex items-center">
             <Button
               variant="ghost" 
