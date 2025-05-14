@@ -2,9 +2,15 @@
 import React, { useState } from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileImage, Trash2, Image, Files } from "lucide-react";
+import { FileImage, Trash2, Image, Files, MoreHorizontal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 interface DocumentsListProps {
   documents: Document[];
@@ -80,25 +86,45 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
                 )}
               </div>
             </div>
-            <div className="flex items-center space-x-1">
-              {onExtractFigures && doc.type.toLowerCase() !== "image" && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="text-slate-700 flex-shrink-0"
-                  onClick={() => onExtractFigures(doc.id)}
-                >
-                  <FileImage className="h-4 w-4 mr-1" /> Extract Figures
-                </Button>
-              )}
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-slate-500 hover:text-red-500 flex-shrink-0"
-                onClick={() => handleDeleteClick(doc.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-slate-500 hover:text-slate-700 flex-shrink-0"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    className="text-slate-600 cursor-pointer"
+                    onClick={() => alert("Edit feature not implemented yet")}
+                  >
+                    <FileImage className="mr-2 h-4 w-4" />
+                    Edit Document
+                  </DropdownMenuItem>
+                  
+                  {onExtractFigures && doc.type.toLowerCase() !== "image" && (
+                    <DropdownMenuItem
+                      className="text-slate-600 cursor-pointer"
+                      onClick={() => onExtractFigures(doc.id)}
+                    >
+                      <FileImage className="mr-2 h-4 w-4" />
+                      Extract Figures
+                    </DropdownMenuItem>
+                  )}
+                  
+                  <DropdownMenuItem
+                    className="text-red-600 cursor-pointer"
+                    onClick={() => handleDeleteClick(doc.id)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Document
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </li>
         ))}
