@@ -2,7 +2,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import LandingPage from "@/pages/Index";
-import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
 import Workspace from "@/pages/Workspace";
 import ReportPage from "@/pages/ReportPage";
@@ -12,7 +11,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/workspace/:uploadType" element={<Workspace />} />
         <Route path="/workspace/:uploadType/:labelId" element={<Workspace />} />
         <Route path="/report/:projectId" element={<ReportPage />} />
