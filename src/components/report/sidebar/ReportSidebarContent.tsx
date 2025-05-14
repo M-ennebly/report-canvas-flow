@@ -55,10 +55,6 @@ const ReportSidebarContent = ({
     testing: "Testing",
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
     <ScrollArea className="flex-1">
       <div className="p-4">

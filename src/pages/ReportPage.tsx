@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Project, Document } from "@/types";
+import { Project } from "@/types";
 import ReportSidebar from "@/components/report/ReportSidebar";
 import ReportHeader from "@/components/report/ReportHeader";
 import ReportContent from "@/components/report/ReportContent";
@@ -93,28 +93,24 @@ const ReportPage = () => {
     }
   }, [activeFigureId, activeTaskId, projectId]);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50 flex overflow-hidden">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-slate-50 flex">
+      {/* Sidebar - Now fixed width */}
       <ReportSidebar 
-        project={project} 
-        isOpen={sidebarOpen} 
-        onToggleSidebar={toggleSidebar}
+        project={project}
+        isOpen={true} 
+        onToggleSidebar={() => {}} // Empty function as we don't want it to collapse
         onTaskSelect={setActiveTaskId}
         onFigureSelect={setActiveFigureId} 
       />
       
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'ml-0 md:ml-64' : 'ml-0'}`}>
+      <div className="flex-1 flex flex-col">
         {/* Header */}
         <ReportHeader 
           projectName={project.name}
-          sidebarOpen={sidebarOpen}
-          toggleSidebar={toggleSidebar}
+          sidebarOpen={true}
+          toggleSidebar={() => {}} // Empty function as we don't want it to collapse
         />
 
         {/* Report Content */}

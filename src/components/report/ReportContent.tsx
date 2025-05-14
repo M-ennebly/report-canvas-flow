@@ -33,7 +33,7 @@ const ReportContent = ({ project, activeFigureId, activeTaskId }: ReportContentP
 
   return (
     <ScrollArea className="flex-1">
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="py-8 px-8 max-w-4xl mx-auto">
         {/* Project Description */}
         <ReportProjectOverview description={project.description} />
 
