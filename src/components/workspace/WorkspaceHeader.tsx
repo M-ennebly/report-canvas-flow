@@ -42,15 +42,18 @@ const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
   
   return (
     <header className="bg-white border-b p-4 flex items-center justify-between">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <Button variant="ghost" onClick={() => navigate("/")} className="mr-2">
           <ChevronLeft className="h-4 w-4 mr-1" />
           Back
         </Button>
-        <h1 className="text-lg font-semibold">
-          {projectName} {labelId && `- ${labelId.charAt(0).toUpperCase() + labelId.slice(1)}`}
-        </h1>
+        <img src="/lovable-uploads/a868b9c0-a265-4983-86f4-3c67b7127c4a.png" alt="DigiClaim Logo" className="h-6" />
       </div>
+      
+      <h1 className="text-lg font-semibold absolute left-1/2 transform -translate-x-1/2">
+        {projectName} {labelId && `- ${labelId.charAt(0).toUpperCase() + labelId.slice(1)}`}
+      </h1>
+      
       <Button onClick={handleGenerateReport}>
         <FileText className="h-4 w-4 mr-2" />
         Generate Project Report
