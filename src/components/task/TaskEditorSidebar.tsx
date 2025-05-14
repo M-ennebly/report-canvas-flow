@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { Task, Figure } from "@/types";
-import { Button } from "@/components/ui/button";
+import { Task } from "@/types";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ChevronDown, ChevronUp, Trash2, X, Save } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TaskEditorHeader from "./TaskEditorHeader";
+import TaskEditorFigure from "./TaskEditorFigure";
+import TaskEditorFooter from "./TaskEditorFooter";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface TaskEditorSidebarProps {
   task: Task | null;
@@ -123,12 +123,11 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
   return (
     <div className={`fixed inset-y-0 right-0 w-full md:w-1/2 lg:w-1/3 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
       <div className="h-full bg-white shadow-xl border-l flex flex-col">
-        <div className={`p-4 ${columnColors[editedTask.column]} text-white flex items-center justify-between`}>
-          <h2 className="text-xl font-semibold flex items-center">Edit Task</h2>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/20" onClick={onClose}>
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+        <TaskEditorHeader 
+          title="Edit Task" 
+          colorClass={columnColors[editedTask.column]} 
+          onClose={onClose} 
+        />
         
         <div className="flex-grow overflow-y-auto p-6">
           <div className="space-y-6">
@@ -189,73 +188,16 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
                   </div>
                 ) : (
                   editedTask.figures.map((figure, index) => (
-                    <Collapsible 
-                      key={figure.id} 
-                      open={!collapsedFigures[figure.id]}
-                      onOpenChange={() => toggleFigureCollapse(figure.id)}
-                      className="border rounded-lg overflow-hidden transition-all duration-200 hover:border-blue-300"
-                    >
-                      <CollapsibleTrigger className="w-full group">
-                        <div className="p-3 bg-white border-b flex justify-between items-center hover:bg-blue-50 transition-colors duration-200">
-                          <h4 className="text-sm font-medium text-gray-800">
-                            {figure.title || `Figure ${index + 1}`}
-                          </h4>
-                          <div className="flex items-center">
-                            <Button
-                              variant="ghost" 
-                              size="sm"
-                              className="text-gray-400 hover:text-red-500 p-1 h-auto"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteFigure(figure.id);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                            {collapsedFigures[figure.id] ? (
-                              <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-blue-500 transition-colors" />
-                            ) : (
-                              <ChevronUp className="h-4 w-4 text-gray-500 group-hover:text-blue-500 transition-colors" />
-                            )}
-                          </div>
-                        </div>
-                      </CollapsibleTrigger>
-                      
-                      <CollapsibleContent>
-                        <div className="p-4 space-y-4 bg-white">
-                          <div className="overflow-hidden rounded-md flex-grow">
-                            <AspectRatio ratio={16/9}>
-                              <img
-                                src={figure.imageUrl}
-                                alt={figure.title}
-                                className="w-full h-full object-cover rounded-md shadow-sm hover:shadow-md transition-shadow duration-200"
-                              />
-                            </AspectRatio>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Figure Title</label>
-                            <Input
-                              value={figure.title}
-                              onChange={(e) => handleFigureTitleChange(figure.id, e.target.value)}
-                              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Enter figure title"
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">Figure Description</label>
-                            <Textarea
-                              value={figure.description}
-                              onChange={(e) => handleFigureDescriptionChange(figure.id, e.target.value)}
-                              rows={3}
-                              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Enter figure description"
-                            />
-                          </div>
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
+                    <TaskEditorFigure
+                      key={figure.id}
+                      figure={figure}
+                      index={index}
+                      isCollapsed={!!collapsedFigures[figure.id]}
+                      onToggleCollapse={() => toggleFigureCollapse(figure.id)}
+                      onTitleChange={(value) => handleFigureTitleChange(figure.id, value)}
+                      onDescriptionChange={(value) => handleFigureDescriptionChange(figure.id, value)}
+                      onDelete={() => handleDeleteFigure(figure.id)}
+                    />
                   ))
                 )}
               </div>
@@ -263,12 +205,7 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
           </div>
         </div>
         
-        <div className="p-4 border-t bg-gray-50">
-          <Button onClick={handleSave} className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
-            <Save className="h-4 w-4 mr-2" />
-            Save Changes
-          </Button>
-        </div>
+        <TaskEditorFooter onSave={handleSave} />
       </div>
       
       <div 
