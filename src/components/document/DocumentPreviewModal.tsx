@@ -9,7 +9,7 @@ import DocumentPreviewHeader from "./preview/DocumentPreviewHeader";
 import PreviewPanel from "./preview/PreviewPanel";
 import FiguresPanel from "./preview/FiguresPanel";
 import { useDocumentPreview, CroppedFigure } from "@/hooks/document/useDocumentPreview";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface DocumentPreviewModalProps {
   document: Document | null;
@@ -54,11 +54,11 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       return;
     }
 
-    // Execute save logic
-    const saveResult = handleSave();
+    // Execute save logic and get the result (boolean)
+    const saveSuccess = handleSave();
     
     // Only close the modal if save was successful
-    if (saveResult) {
+    if (saveSuccess === true) {
       onClose();
     }
   };

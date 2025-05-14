@@ -14,30 +14,30 @@ export const cropImage = (
   cropHeight: number,
   documentUrl?: string
 ): string => {
-  // Create a canvas element
-  const canvas = window.document.createElement('canvas');
-  canvas.width = cropWidth;
-  canvas.height = cropHeight;
-  
-  // Get the 2D context of the canvas
-  const context = canvas.getContext('2d');
-  if (!context) {
-    console.error("Failed to get canvas context");
-    return documentUrl || '';
-  }
-  
-  // Check if image is fully loaded
-  if (image.complete === false || image.naturalWidth === 0) {
-    console.error("Image is not fully loaded");
-    throw new Error("Image is not fully loaded");
-  }
-  
-  // Calculate the actual coordinates on the image
-  const imgRect = image.getBoundingClientRect();
-  const scaleX = image.naturalWidth / imgRect.width;
-  const scaleY = image.naturalHeight / imgRect.height;
-  
   try {
+    // Create a canvas element
+    const canvas = window.document.createElement('canvas');
+    canvas.width = cropWidth;
+    canvas.height = cropHeight;
+    
+    // Get the 2D context of the canvas
+    const context = canvas.getContext('2d');
+    if (!context) {
+      console.error("Failed to get canvas context");
+      return documentUrl || '';
+    }
+    
+    // Check if image is fully loaded
+    if (!image.complete || image.naturalWidth === 0) {
+      console.error("Image is not fully loaded");
+      throw new Error("Image is not fully loaded");
+    }
+    
+    // Calculate the actual coordinates on the image
+    const imgRect = image.getBoundingClientRect();
+    const scaleX = image.naturalWidth / imgRect.width;
+    const scaleY = image.naturalHeight / imgRect.height;
+    
     context.drawImage(
       image,
       cropStartX * scaleX, 
@@ -54,7 +54,7 @@ export const cropImage = (
     return canvas.toDataURL('image/png');
   } catch (err) {
     console.error("Error cropping image:", err);
-    throw err; // Re-throw to handle in the calling function
+    return documentUrl || ''; // Return the original image URL as fallback
   }
 };
 
@@ -64,8 +64,9 @@ export const cropImage = (
 export const isDocumentImage = (type?: string): boolean => {
   if (!type) return false;
   
-  return type.toLowerCase() === "image" || 
-    ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(type.toLowerCase());
+  const lowerType = type.toLowerCase();
+  return lowerType === "image" || 
+    ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(lowerType);
 };
 
 /**
@@ -81,10 +82,10 @@ export const createFigureFromCrop = (
     id,
     figure: {
       id,
-      title: `Figure from ${document.name}`,
+      title: `Figure from ${document.name || "document"}`,
       description: "",
       imageUrl: croppedImageUrl,
-      sourceDocumentId: document.id,
+      sourceDocumentId: document.id || "",
       label: document.label // Inherit label from source document if available
     }
   };

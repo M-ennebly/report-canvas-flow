@@ -39,12 +39,12 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   
   if (!document) return null;
   
-  const isImage = document.type.toLowerCase() === "image" || 
-    ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(document.type.toLowerCase() || "");
+  const isImage = document.type?.toLowerCase() === "image" || 
+    ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(document.type?.toLowerCase() || "");
 
-  const isPdf = document.type.toLowerCase() === "pdf";
-  const isDocx = ["doc", "docx", "word"].includes(document.type.toLowerCase());
-  const isPpt = ["ppt", "pptx", "powerpoint"].includes(document.type.toLowerCase());
+  const isPdf = document.type?.toLowerCase() === "pdf";
+  const isDocx = ["doc", "docx", "word"].includes(document.type?.toLowerCase() || "");
+  const isPpt = ["ppt", "pptx", "powerpoint"].includes(document.type?.toLowerCase() || "");
 
   const handleZoomIn = () => {
     setZoomLevel(prev => Math.min(prev + 0.25, 3));
@@ -93,7 +93,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
             <img
               ref={imgRef}
               src={document.url}
-              alt={document.name}
+              alt={document.name || "Document preview"}
               className="max-w-full object-contain transform-gpu transition-transform"
               style={{ transform: `scale(${zoomLevel})` }}
               onLoad={() => {
@@ -136,7 +136,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({
           <iframe
             src={`${document.url}#view=FitH&zoom=${zoomLevel * 100}`}
             className="w-full h-[calc(100vh-250px)]"
-            title={document.name}
+            title={document.name || "PDF document"}
           />
         </ScrollArea>
         
@@ -170,18 +170,25 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       <div className="w-full h-full relative">
         <ScrollArea className="h-full w-full">
           <div className="w-full h-full p-6">
-            {document.url.startsWith('http') && (
+            {document.url && document.url.startsWith('http') && (
               <iframe 
                 src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(document.url)}`}
                 className="w-full h-[calc(100vh-250px)] border"
-                title={document.name}
+                title={document.name || "Word document"}
               />
             )}
             
-            {!document.url.startsWith('http') && document.url.startsWith('blob:') && (
+            {document.url && !document.url.startsWith('http') && document.url.startsWith('blob:') && (
               <div className="text-center p-6 bg-slate-50 rounded-md">
                 <p className="text-slate-600">To preview this DOCX file, please save it first.</p>
                 <p className="text-sm text-slate-500 mt-2">File: {document.name}</p>
+              </div>
+            )}
+            
+            {!document.url && (
+              <div className="text-center p-6 bg-slate-50 rounded-md">
+                <p className="text-slate-600">No document URL provided.</p>
+                <p className="text-sm text-slate-500 mt-2">File: {document.name || "Unknown"}</p>
               </div>
             )}
           </div>
@@ -195,18 +202,25 @@ const FilePreview: React.FC<FilePreviewProps> = ({
       <div className="w-full h-full relative">
         <ScrollArea className="h-full w-full">
           <div className="w-full h-full p-6">
-            {document.url.startsWith('http') && (
+            {document.url && document.url.startsWith('http') && (
               <iframe 
                 src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(document.url)}`}
                 className="w-full h-[calc(100vh-250px)] border"
-                title={document.name}
+                title={document.name || "PowerPoint document"}
               />
             )}
             
-            {!document.url.startsWith('http') && (
+            {document.url && !document.url.startsWith('http') && (
               <div className="text-center p-6 bg-slate-50 rounded-md">
                 <p className="text-slate-600">To preview this PowerPoint file, please save it first.</p>
                 <p className="text-sm text-slate-500 mt-2">File: {document.name}</p>
+              </div>
+            )}
+            
+            {!document.url && (
+              <div className="text-center p-6 bg-slate-50 rounded-md">
+                <p className="text-slate-600">No document URL provided.</p>
+                <p className="text-sm text-slate-500 mt-2">File: {document.name || "Unknown"}</p>
               </div>
             )}
           </div>
@@ -218,8 +232,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   } else {
     return (
       <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
-        <div className="text-xl font-medium text-slate-600 mb-2">{document.type.toUpperCase()}</div>
-        <p className="text-slate-600">{document.name}</p>
+        <div className="text-xl font-medium text-slate-600 mb-2">{document.type?.toUpperCase() || "Unknown Type"}</div>
+        <p className="text-slate-600">{document.name || "Unnamed document"}</p>
         <p className="mt-4 text-sm text-slate-500">Preview not available for this file type.</p>
       </div>
     );

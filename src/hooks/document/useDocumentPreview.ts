@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Document } from "@/types";
 import { 
   CroppedFigure, 
@@ -40,7 +40,7 @@ export function useDocumentPreview(
   } = useFigureUtils();
 
   // Determine if document is an image
-  const isImage = isDocumentImage(document?.type);
+  const isImage = document ? isDocumentImage(document.type) : false;
 
   const handleStartCrop = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!croppingMode) return;
@@ -154,20 +154,30 @@ export function useDocumentPreview(
   };
 
   const handleSave = (): boolean => {
-    // Validate figures have titles
-    const { valid, index } = validateFigures(croppedFigures);
-    if (!valid) {
-      const figureId = showValidationError(index, croppedFigures);
-      setActiveFigureId(figureId);
+    try {
+      // Validate figures have titles
+      const { valid, index } = validateFigures(croppedFigures);
+      if (!valid) {
+        const figureId = showValidationError(index, croppedFigures);
+        setActiveFigureId(figureId);
+        return false;
+      }
+
+      if (onSaveFigures) {
+        onSaveFigures(croppedFigures);
+      }
+      
+      showSaveSuccess(croppedFigures.length);
+      return true;
+    } catch (error) {
+      console.error("Error saving figures:", error);
+      toast({
+        title: "Error saving figures",
+        description: "There was an error saving your figures. Please try again.",
+        variant: "destructive"
+      });
       return false;
     }
-
-    if (onSaveFigures) {
-      onSaveFigures(croppedFigures);
-    }
-    
-    showSaveSuccess(croppedFigures.length);
-    return true;
   };
 
   return {

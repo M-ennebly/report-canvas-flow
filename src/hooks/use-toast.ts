@@ -1,3 +1,4 @@
+
 // This file is based on the shadcn/ui toast implementation
 import * as React from "react"
 
@@ -7,7 +8,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 5
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
