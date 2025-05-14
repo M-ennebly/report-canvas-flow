@@ -9,6 +9,7 @@ import DocumentPreviewHeader from "./preview/DocumentPreviewHeader";
 import PreviewPanel from "./preview/PreviewPanel";
 import FiguresPanel from "./preview/FiguresPanel";
 import { useDocumentPreview, CroppedFigure } from "@/hooks/document/useDocumentPreview";
+import { useToast } from "@/hooks/use-toast";
 
 interface DocumentPreviewModalProps {
   document: Document | null;
@@ -23,6 +24,8 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   onClose,
   onSaveFigures,
 }) => {
+  const { toast } = useToast();
+  
   const {
     isImage,
     croppingMode,
@@ -41,6 +44,30 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     handleDeleteFigure,
     handleSave
   } = useDocumentPreview(document, onSaveFigures);
+
+  const handleSaveAndClose = () => {
+    // Check if figures exist
+    if (croppedFigures.length === 0) {
+      toast({
+        title: "No figures to save",
+        description: "Please select at least one area to save as a figure.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Execute save logic
+    handleSave();
+
+    // Show success toast and close modal
+    toast({
+      title: "Figures saved successfully",
+      description: `${croppedFigures.length} figure(s) have been saved.`
+    });
+    
+    // Close the modal
+    onClose();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -81,10 +108,10 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={() => {
-            handleSave();
-            onClose();
-          }} disabled={croppedFigures.length === 0}>
+          <Button 
+            onClick={handleSaveAndClose} 
+            disabled={croppedFigures.length === 0}
+          >
             Save Figures ({croppedFigures.length})
           </Button>
         </DialogFooter>

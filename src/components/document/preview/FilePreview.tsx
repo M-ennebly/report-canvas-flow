@@ -1,7 +1,8 @@
-
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Document } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { ZoomIn, ZoomOut } from "lucide-react";
 
 interface FilePreviewProps {
   document: Document | null;
@@ -27,11 +28,47 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   onMouseLeave,
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
   
   if (!document) return null;
   
   const isImage = document.type.toLowerCase() === "image" || 
     ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(document.type.toLowerCase() || "");
+
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
+  };
+  
+  // Render controls for zoom
+  const renderZoomControls = () => (
+    <div className="absolute top-3 right-3 bg-white rounded-md shadow-sm border flex">
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={handleZoomOut}
+        disabled={zoomLevel <= 0.5}
+        className="h-8 w-8"
+      >
+        <ZoomOut className="h-4 w-4" />
+      </Button>
+      <div className="flex items-center px-2 text-xs font-medium">
+        {Math.round(zoomLevel * 100)}%
+      </div>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={handleZoomIn}
+        disabled={zoomLevel >= 3}
+        className="h-8 w-8"
+      >
+        <ZoomIn className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 
   // Render file preview based on type
   if (isImage) {
@@ -46,7 +83,8 @@ const FilePreview: React.FC<FilePreviewProps> = ({
               ref={imgRef}
               src={document.url}
               alt={document.name}
-              className="max-w-full object-contain"
+              className="max-w-full object-contain transform-gpu transition-transform"
+              style={{ transform: `scale(${zoomLevel})` }}
               onLoad={() => {
                 // Ensure image is loaded before allowing cropping
                 console.log("Image loaded successfully");
@@ -74,31 +112,67 @@ const FilePreview: React.FC<FilePreviewProps> = ({
               />
             )}
           </div>
+          
+          {renderZoomControls()}
         </div>
       </ScrollArea>
     );
-  } else if (document.type === "pdf") {
+  } else if (document.type.toLowerCase() === "pdf") {
     return (
-      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
-        <div className="text-3xl font-bold text-red-500 mb-2">PDF</div>
-        <p className="text-slate-600">{document.name}</p>
-        <p className="mt-4 text-sm text-slate-500">Preview not available for PDF files.</p>
+      <div className="w-full h-full relative">
+        <ScrollArea className="h-full w-full">
+          <iframe
+            src={`${document.url}#view=FitH&zoom=${zoomLevel * 100}`}
+            className="w-full h-[calc(100vh-250px)]"
+            title={document.name}
+            style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }}
+          />
+        </ScrollArea>
+        {renderZoomControls()}
       </div>
     );
   } else if (["doc", "docx", "word"].includes(document.type.toLowerCase())) {
     return (
-      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
-        <div className="text-3xl font-bold text-blue-500 mb-2">DOCX</div>
-        <p className="text-slate-600">{document.name}</p>
-        <p className="mt-4 text-sm text-slate-500">Preview not available for Word documents.</p>
+      <div className="w-full h-full relative">
+        <ScrollArea className="h-full w-full">
+          <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
+            <div className="text-3xl font-bold text-blue-500 mb-2">DOCX</div>
+            <p className="text-slate-600">{document.name}</p>
+            <p className="mt-4 mb-6 text-sm text-slate-500">Preview available in document explorer.</p>
+            
+            {document.url.endsWith('.docx') && (
+              <iframe 
+                src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(document.url)}`}
+                className="w-full h-[calc(100vh-350px)] border"
+                title={document.name}
+                style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }}
+              />
+            )}
+          </div>
+        </ScrollArea>
+        {renderZoomControls()}
       </div>
     );
   } else if (["ppt", "pptx", "powerpoint"].includes(document.type.toLowerCase())) {
     return (
-      <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
-        <div className="text-3xl font-bold text-orange-500 mb-2">PPT</div>
-        <p className="text-slate-600">{document.name}</p>
-        <p className="mt-4 text-sm text-slate-500">Preview not available for PowerPoint files.</p>
+      <div className="w-full h-full relative">
+        <ScrollArea className="h-full w-full">
+          <div className="w-full h-full text-center p-10 bg-slate-100 flex flex-col items-center justify-center rounded-md">
+            <div className="text-3xl font-bold text-orange-500 mb-2">PPT</div>
+            <p className="text-slate-600">{document.name}</p>
+            <p className="mt-4 mb-6 text-sm text-slate-500">Preview available in document explorer.</p>
+            
+            {document.url.endsWith('.pptx') && (
+              <iframe 
+                src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(document.url)}`}
+                className="w-full h-[calc(100vh-350px)] border"
+                title={document.name}
+                style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }}
+              />
+            )}
+          </div>
+        </ScrollArea>
+        {renderZoomControls()}
       </div>
     );
   } else {
