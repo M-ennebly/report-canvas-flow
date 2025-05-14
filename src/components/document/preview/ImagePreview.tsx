@@ -2,8 +2,8 @@
 import React, { useState, useRef } from "react";
 import { Document } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import ZoomControls from "./ZoomControls";
-import CropOverlay from "./CropOverlay";
+import ZoomControls from "./components/ZoomControls";
+import CropOverlay from "./components/CropOverlay";
 
 interface ImagePreviewProps {
   document: Document;
