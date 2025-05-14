@@ -10,10 +10,10 @@ import {
 import { cropImage, isDocumentImage, createFigureFromCrop } from "./cropUtils";
 import { useFigureUtils } from "./figureUtils";
 
-export function useDocumentPreview({ 
-  document, 
-  onSaveFigures 
-}: UseDocumentPreviewProps): UseDocumentPreviewReturn {
+export function useDocumentPreview(
+  document: Document | null,
+  onSaveFigures?: (figures: CroppedFigure[]) => void
+): UseDocumentPreviewReturn {
   const { toast } = useToast();
   const { 
     validateFigures, 
