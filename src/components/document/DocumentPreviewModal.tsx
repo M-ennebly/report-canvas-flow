@@ -56,17 +56,13 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       return;
     }
 
-    // Execute save logic
-    handleSave();
-
-    // Show success toast and close modal
-    toast({
-      title: "Figures saved successfully",
-      description: `${croppedFigures.length} figure(s) have been saved.`
-    });
+    // Execute save logic and get the result
+    const saveSuccessful = handleSave();
     
-    // Close the modal
-    onClose();
+    // Only close if save was successful
+    if (saveSuccessful) {
+      onClose();
+    }
   };
 
   return (

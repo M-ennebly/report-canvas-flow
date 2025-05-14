@@ -8,6 +8,7 @@ import { ChevronDown, ChevronUp, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface TaskEditorSidebarProps {
   task: Task | null;
@@ -47,6 +48,13 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedTask({ ...editedTask, title: e.target.value });
+  };
+  
+  const handleColumnChange = (value: string) => {
+    setEditedTask({ 
+      ...editedTask, 
+      column: value as "design" | "analyse" | "dev" | "testing" 
+    });
   };
 
   const handleFigureTitleChange = (figureId: string, value: string) => {
@@ -93,6 +101,14 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
     }));
   };
 
+  // Column display names
+  const columnNames = {
+    design: "Design",
+    analyse: "Analysis",
+    dev: "Development",
+    testing: "Testing"
+  };
+
   return (
     <div className={`fixed inset-y-0 right-0 w-full md:w-1/2 lg:w-1/3 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
       <div className="h-full bg-white shadow-xl border-l flex flex-col">
@@ -111,6 +127,25 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
                 value={editedTask.title}
                 onChange={handleTitleChange}
               />
+            </div>
+            
+            {/* New Task Column/Label Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Task Column/Label</label>
+              <Select
+                value={editedTask.column}
+                onValueChange={handleColumnChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select column" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="design">{columnNames.design}</SelectItem>
+                  <SelectItem value="analyse">{columnNames.analyse}</SelectItem>
+                  <SelectItem value="dev">{columnNames.dev}</SelectItem>
+                  <SelectItem value="testing">{columnNames.testing}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="w-full border rounded-md">

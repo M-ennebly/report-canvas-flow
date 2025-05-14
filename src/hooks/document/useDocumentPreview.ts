@@ -56,7 +56,7 @@ export function useDocumentPreview(
   };
 
   const handleEndCrop = () => {
-    if (!croppingMode || !cropStart || !cropEnd || !document || !imgRef.current) {
+    if (!croppingMode || !cropStart || !cropEnd || !document) {
       setCropStart(null);
       setCropEnd(null);
       return;
@@ -65,7 +65,8 @@ export function useDocumentPreview(
     // Skip if area is too small
     if (Math.abs(cropEnd.x - cropStart.x) < 20 || Math.abs(cropEnd.y - cropStart.y) < 20) {
       toast({
-        description: "Selected area is too small. Please select a larger area.",
+        title: "Selected area too small",
+        description: "Please select a larger area.",
         variant: "destructive"
       });
       return;
@@ -77,15 +78,27 @@ export function useDocumentPreview(
     const cropWidth = Math.abs(cropEnd.x - cropStart.x);
     const cropHeight = Math.abs(cropEnd.y - cropStart.y);
     
-    // Generate the cropped image
-    const croppedImageUrl = cropImage(
-      imgRef.current,
-      cropStartX,
-      cropStartY, 
-      cropWidth,
-      cropHeight,
-      document?.url
-    );
+    // For image documents, use canvas to crop
+    let croppedImageUrl = "";
+    if (isImage && imgRef.current) {
+      croppedImageUrl = cropImage(
+        imgRef.current,
+        cropStartX,
+        cropStartY, 
+        cropWidth,
+        cropHeight,
+        document?.url
+      );
+    } 
+    // For non-image documents, use a screenshot approach or placeholder
+    else {
+      // Use a placeholder or screenshot approach if implementing PDF cropping
+      croppedImageUrl = document.url || "";
+      toast({
+        title: "Area selected",
+        description: "Non-image document cropping uses the full page."
+      });
+    }
     
     // Create a new figure with the cropped image
     const { id, figure } = createFigureFromCrop(document, croppedImageUrl);
@@ -128,7 +141,7 @@ export function useDocumentPreview(
     if (!valid) {
       const figureId = showValidationError(index, croppedFigures);
       setActiveFigureId(figureId);
-      return;
+      return false;
     }
 
     if (onSaveFigures) {
@@ -136,6 +149,7 @@ export function useDocumentPreview(
     }
     
     showSaveSuccess(croppedFigures.length);
+    return true;
   };
 
   return {
