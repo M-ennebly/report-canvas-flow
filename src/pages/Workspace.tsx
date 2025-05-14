@@ -20,8 +20,7 @@ const Workspace = () => {
         const documents = JSON.parse(storedDocuments);
         setUploadedDocuments(documents);
         
-        // Clear session storage to prevent reloading on page refresh
-        sessionStorage.removeItem('uploadedDocuments');
+        // Don't remove from session storage yet - WorkspaceContent will handle that
       } catch (error) {
         console.error("Error parsing uploaded documents:", error);
       }

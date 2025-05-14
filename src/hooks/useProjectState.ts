@@ -52,19 +52,32 @@ export const useProjectState = (
     });
   };
 
-  const handleDocumentUpload = (files: FileList) => {
-    const newDocuments = Array.from(files).map((file) => ({
-      id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: file.name,
-      type: file.name.split(".").pop() || "unknown",
-      url: URL.createObjectURL(file),
-      dateUploaded: new Date().toISOString(),
-    }));
+  // Updated to handle both FileList and Document[] inputs
+  const handleDocumentUpload = (files: FileList | Document[]) => {
+    let newDocuments: Document[] = [];
+    
+    if (files instanceof FileList) {
+      // Handle FileList input from file uploader
+      newDocuments = Array.from(files).map((file) => ({
+        id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: file.name,
+        type: file.name.split(".").pop() || "unknown",
+        url: URL.createObjectURL(file),
+        dateUploaded: new Date().toISOString(),
+      }));
+    } else {
+      // Handle Document[] input from session storage
+      newDocuments = files;
+    }
 
     setProject({
       ...project,
       documents: [...project.documents, ...newDocuments],
     });
+    
+    if (newDocuments.length > 0) {
+      toast.success(`${newDocuments.length} document(s) added`);
+    }
   };
   
   const handleDocumentDelete = (documentId: string) => {

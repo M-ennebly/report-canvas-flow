@@ -33,7 +33,6 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       onDocumentUpload(e.target.files);
-      toast.success(`${e.target.files.length} document(s) uploaded`);
       e.target.value = ""; // Reset input
     }
   };
@@ -41,7 +40,6 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   const handleDeleteDocument = (documentId: string) => {
     if (onDocumentDelete) {
       onDocumentDelete(documentId);
-      toast.success("Document deleted");
     }
   };
   
@@ -151,11 +149,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
         </div>
       </div>
       
-      <div className="p-4 border-t mt-auto">
-        <Button variant="default" className="w-full">
-          Generate Project Report
-        </Button>
-      </div>
+      {/* Removed the "Generate Project Report" button from here */}
     </div>
   );
 };

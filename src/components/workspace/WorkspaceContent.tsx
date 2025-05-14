@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Document, Task } from "@/types";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import DocumentPanel from "@/components/document/DocumentPanel";
@@ -35,6 +35,24 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
   // Selected task for editing
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  // Initialize with documents from session storage if available
+  useEffect(() => {
+    const storedDocuments = sessionStorage.getItem('uploadedDocuments');
+    if (storedDocuments) {
+      try {
+        const documents = JSON.parse(storedDocuments);
+        if (documents && documents.length > 0) {
+          handleDocumentUpload(documents);
+        }
+        
+        // Clear session storage after processing
+        sessionStorage.removeItem('uploadedDocuments');
+      } catch (error) {
+        console.error("Error parsing uploaded documents:", error);
+      }
+    }
+  }, []);
 
   const handleTaskClick = (taskId: string) => {
     const task = project.tasks.find((t) => t.id === taskId);
