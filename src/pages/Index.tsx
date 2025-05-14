@@ -114,6 +114,13 @@ const LandingPage = () => {
     }
   };
 
+  const scrollToUpload = () => {
+    const uploadSection = document.getElementById('upload');
+    if (uploadSection) {
+      uploadSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
       {/* Header/Navigation */}
@@ -145,7 +152,7 @@ const LandingPage = () => {
                 Transform how you organize and utilize figures from documents with our intuitive kanban workflow system. Save time, increase productivity, and deliver exceptional reports.
               </p>
               <div>
-                <Button className="bg-kanban-analyse hover:bg-kanban-analyse/90 text-white" size="lg" onClick={() => document.getElementById('upload')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Button className="bg-kanban-analyse hover:bg-kanban-analyse/90 text-white" size="lg" onClick={scrollToUpload}>
                   Get Started
                   <MoveRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -265,7 +272,13 @@ const LandingPage = () => {
                         variant="default" 
                         size="sm"
                         className="bg-gradient-to-r from-kanban-analyse to-kanban-analyse/80 hover:from-kanban-analyse/90 hover:to-kanban-analyse text-white border-none"
-                        onClick={() => document.querySelector('input[type="file"]')?.click()}
+                        onClick={() => {
+                          // Using a type-safe way to select and click the file input
+                          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement | null;
+                          if (fileInput) {
+                            fileInput.click();
+                          }
+                        }}
                       >
                         <FileUp className="h-4 w-4 mr-1" /> Select Files
                       </Button>
