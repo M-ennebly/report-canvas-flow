@@ -58,8 +58,8 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
 
   return (
     <div className="flex-grow flex overflow-hidden">
-      {/* Left Document Panel */}
-      <div className="w-80 lg:w-96 hidden md:block bg-white border-r overflow-y-auto">
+      {/* Left Document Panel - now takes no space when collapsed */}
+      <div className="hidden md:flex">
         <DocumentPanel
           project={project}
           onDescriptionChange={handleDescriptionChange}
