@@ -59,8 +59,8 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
   };
 
   return (
-    <div className={`fixed inset-y-0 left-0 w-full md:w-1/2 lg:w-1/3 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
-      <div className="h-full bg-white shadow-xl border-r flex flex-col">
+    <div className={`fixed inset-y-0 right-0 w-full md:w-1/2 lg:w-1/3 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
+      <div className="h-full bg-white shadow-xl border-l flex flex-col">
         <div className="p-4 border-b bg-slate-50 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Edit Task</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>

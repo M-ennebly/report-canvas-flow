@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -165,6 +166,20 @@ const Workspace = () => {
 
       {/* Main Content */}
       <div className="flex-grow flex overflow-hidden">
+        {/* Left Document Panel */}
+        <div 
+          className={`w-80 lg:w-96 transition-transform duration-300 fixed md:relative left-0 top-16 md:top-0 bottom-0 z-40 md:z-auto md:translate-x-0 ${
+            isDocPanelOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <DocumentPanel
+            project={project}
+            onDescriptionChange={handleDescriptionChange}
+            onLinkedReportChange={handleLinkedReportChange}
+            onDocumentUpload={handleDocumentUpload}
+          />
+        </div>
+
         {/* Kanban Board Area */}
         <div className="flex-1 p-4 overflow-y-auto">
           <KanbanBoard 
@@ -175,32 +190,18 @@ const Workspace = () => {
         </div>
 
         {/* Document Panel Toggle for Mobile */}
-        <div className="md:hidden fixed bottom-4 right-4">
+        <div className="md:hidden fixed bottom-4 left-4">
           <Button 
             variant="secondary"
             onClick={() => setIsDocPanelOpen(!isDocPanelOpen)}
             className="rounded-full h-12 w-12 p-0 shadow-lg"
           >
-            {isDocPanelOpen ? <X className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+            {isDocPanelOpen ? <X className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
           </Button>
-        </div>
-
-        {/* Right Document Panel */}
-        <div 
-          className={`w-full md:w-80 lg:w-96 transition-transform duration-300 fixed md:relative right-0 top-16 md:top-0 bottom-0 z-40 md:z-auto md:translate-x-0 ${
-            isDocPanelOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <DocumentPanel
-            project={project}
-            onDescriptionChange={handleDescriptionChange}
-            onLinkedReportChange={handleLinkedReportChange}
-            onDocumentUpload={handleDocumentUpload}
-          />
         </div>
       </div>
 
-      {/* Task Editor Sidebar */}
+      {/* Task Editor Sidebar (now on the right) */}
       <TaskEditorSidebar
         task={selectedTask}
         isOpen={isEditorOpen}
