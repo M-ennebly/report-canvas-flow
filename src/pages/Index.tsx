@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileUp, Tag, Loader2 } from "lucide-react";
+import { FileUp, Tag, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import UploadDropzone from "@/components/upload/UploadDropzone";
 import { Card, CardContent } from "@/components/ui/card";
