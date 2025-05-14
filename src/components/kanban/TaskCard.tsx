@@ -1,0 +1,43 @@
+
+import React from "react";
+import { Task } from "@/types";
+import { Card, CardContent } from "@/components/ui/card";
+
+interface TaskCardProps {
+  task: Task;
+  onClick: () => void;
+  onDragStart: (e: React.DragEvent) => void;
+}
+
+const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDragStart }) => {
+  return (
+    <Card 
+      className="cursor-pointer hover:shadow-md transition-shadow"
+      onClick={onClick}
+      draggable
+      onDragStart={onDragStart}
+    >
+      <CardContent className="p-3">
+        <h4 className="font-medium text-slate-800 mb-2">{task.title}</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {task.figures.slice(0, 4).map((figure) => (
+            <div key={figure.id} className="aspect-video relative rounded bg-slate-100 overflow-hidden">
+              <img
+                src={figure.imageUrl}
+                alt={figure.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+        </div>
+        {task.figures.length > 4 && (
+          <div className="text-xs text-slate-500 mt-2 text-right">
+            +{task.figures.length - 4} more figures
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default TaskCard;

@@ -1,14 +1,62 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { FileUp, Tag } from "lucide-react";
+
+const LandingPage = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="text-center space-y-8 px-4 max-w-3xl">
+        <div className="space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800">
+            Figure Management for Consultants
+          </h1>
+          <p className="text-xl text-slate-600">
+            Streamline your report creation by organizing figures from documents into a structured workflow
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all border border-slate-200 flex flex-col items-center space-y-4">
+            <div className="h-16 w-16 bg-blue-50 rounded-full flex items-center justify-center">
+              <FileUp className="h-8 w-8 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-semibold text-slate-800">Bulk Upload Project</h2>
+            <p className="text-slate-600">
+              Upload multiple documents at once and organize extracted figures across all workflow stages
+            </p>
+            <Button 
+              size="lg" 
+              onClick={() => navigate("/workspace/bulk")}
+              className="mt-4 w-full"
+            >
+              Start Bulk Upload
+            </Button>
+          </div>
+          
+          <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition-all border border-slate-200 flex flex-col items-center space-y-4">
+            <div className="h-16 w-16 bg-purple-50 rounded-full flex items-center justify-center">
+              <Tag className="h-8 w-8 text-purple-600" />
+            </div>
+            <h2 className="text-2xl font-semibold text-slate-800">Label-Based Upload</h2>
+            <p className="text-slate-600">
+              Select a specific workflow stage and upload documents directly to that stage
+            </p>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={() => navigate("/label-upload")}
+              className="mt-4 w-full"
+            >
+              Start Label-Based Upload
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Index;
+export default LandingPage;

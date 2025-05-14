@@ -1,0 +1,141 @@
+
+import React, { useState } from "react";
+import { Document, Project } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { FileUp } from "lucide-react";
+import { toast } from "sonner";
+
+interface DocumentPanelProps {
+  project: Project;
+  onDescriptionChange: (description: string) => void;
+  onLinkedReportChange: (reportId: string) => void;
+  onDocumentUpload: (files: FileList) => void;
+}
+
+const DocumentPanel: React.FC<DocumentPanelProps> = ({
+  project,
+  onDescriptionChange,
+  onLinkedReportChange,
+  onDocumentUpload,
+}) => {
+  const [description, setDescription] = useState(project.description || "");
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(e.target.value);
+    onDescriptionChange(e.target.value);
+  };
+  
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      onDocumentUpload(e.target.files);
+      toast.success(`${e.target.files.length} document(s) uploaded`);
+      e.target.value = ""; // Reset input
+    }
+  };
+  
+  // For demo purposes only
+  const availableReports = [
+    { id: "report1", name: "Q1 2024 Market Analysis" },
+    { id: "report2", name: "Product Strategy 2024" },
+    { id: "report3", name: "Client Onboarding Review" },
+  ];
+
+  return (
+    <div className="h-full bg-white border-l flex flex-col">
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-semibold">Project Details</h2>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        {/* Document Uploader Section */}
+        <div className="p-4 border-b">
+          <h3 className="text-sm font-medium mb-3">Documents</h3>
+          
+          <div className="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center space-y-2">
+            <FileUp className="mx-auto h-6 w-6 text-slate-400" />
+            <p className="text-sm text-slate-500">Upload PDF, DOCX or PPT files</p>
+            <label>
+              <Input 
+                type="file"
+                accept=".pdf,.docx,.doc,.ppt,.pptx"
+                multiple
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2 w-full"
+                asChild
+              >
+                <span>Select Files</span>
+              </Button>
+            </label>
+          </div>
+          
+          {project.documents.length > 0 && (
+            <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
+              {project.documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center p-2 text-sm rounded-md hover:bg-slate-50"
+                >
+                  <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2">
+                    {doc.type === "pdf" ? "PDF" : doc.type === "docx" ? "DOC" : "PPT"}
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <p className="truncate">{doc.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Project Description Section */}
+        <div className="p-4 border-b">
+          <h3 className="text-sm font-medium mb-3">Project Description</h3>
+          <Textarea
+            value={description}
+            onChange={handleDescriptionChange}
+            placeholder="Describe your project here..."
+            className="resize-none h-32"
+          />
+        </div>
+        
+        {/* Linked Report Section */}
+        <div className="p-4">
+          <h3 className="text-sm font-medium mb-3">Linked Report</h3>
+          <Select
+            value={project.linkedReportId || ""}
+            onValueChange={onLinkedReportChange}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a report" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">None</SelectItem>
+              {availableReports.map((report) => (
+                <SelectItem key={report.id} value={report.id}>
+                  {report.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <div className="p-4 border-t mt-auto">
+        <Button variant="default" className="w-full">
+          Generate Project Report
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default DocumentPanel;
