@@ -1,13 +1,13 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { FileUp, Tag, Loader2, Trash2 } from "lucide-react";
+import { FileUp, Tag } from "lucide-react";
 import { toast } from "sonner";
-import UploadDropzone from "@/components/upload/UploadDropzone";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Document } from "@/types";
+import BulkUploadTab from "@/components/upload/BulkUploadTab";
+import LabelUploadTab from "@/components/upload/LabelUploadTab";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -117,61 +117,14 @@ const LandingPage = () => {
           <TabsContent value="bulk">
             <Card>
               <CardContent className="p-6">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold text-slate-800">Upload Multiple Documents</h2>
-                  <p className="text-slate-600">
-                    Upload documents and extract figures across all workflow stages
-                  </p>
-                  
-                  <UploadDropzone 
-                    onFilesSelected={handleBulkUpload}
-                    selectedFiles={selectedFiles}
-                  />
-                  
-                  {/* Document preview list */}
-                  {uploadedDocuments.length > 0 && (
-                    <div className="mt-6 border rounded-md p-4 bg-white">
-                      <h3 className="font-medium mb-2">Selected Documents:</h3>
-                      <ul className="space-y-2 max-h-60 overflow-y-auto">
-                        {uploadedDocuments.map(doc => (
-                          <li key={doc.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
-                            <div className="flex items-center">
-                              <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2 text-xs">
-                                {doc.type.toUpperCase()}
-                              </div>
-                              <span className="truncate">{doc.name}</span>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-slate-500 hover:text-red-500"
-                              onClick={() => removeDocument(doc.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-center mt-6">
-                    <Button 
-                      onClick={() => handleProcessFiles('bulk')}
-                      disabled={!selectedFiles || isLoading}
-                      size="lg"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        "Process and Extract Figures"
-                      )}
-                    </Button>
-                  </div>
-                </div>
+                <BulkUploadTab 
+                  selectedFiles={selectedFiles}
+                  uploadedDocuments={uploadedDocuments}
+                  isLoading={isLoading}
+                  onFilesSelected={handleBulkUpload}
+                  onRemoveDocument={removeDocument}
+                  onProcess={() => handleProcessFiles('bulk')}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -179,72 +132,16 @@ const LandingPage = () => {
           <TabsContent value="label">
             <Card>
               <CardContent className="p-6">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-semibold text-slate-800">Upload to Specific Workflow Stages</h2>
-                  <p className="text-slate-600">
-                    Select specific workflow stages and upload documents directly to those stages
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                    {labels.map((label) => (
-                      <div key={label.id} className="space-y-3">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-4 h-4 ${label.color} rounded-full`}></div>
-                          <h3 className="font-medium">{label.name}</h3>
-                        </div>
-                        <UploadDropzone
-                          onFilesSelected={(files) => handleLabelUpload(files, label.id)}
-                          selectedFiles={selectedLabels.includes(label.id) ? selectedFiles : null}
-                          height="small"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Document preview list for label upload */}
-                  {uploadedDocuments.length > 0 && (
-                    <div className="mt-6 border rounded-md p-4 bg-white">
-                      <h3 className="font-medium mb-2">Selected Documents:</h3>
-                      <ul className="space-y-2 max-h-60 overflow-y-auto">
-                        {uploadedDocuments.map(doc => (
-                          <li key={doc.id} className="flex items-center justify-between p-2 hover:bg-slate-50 rounded">
-                            <div className="flex items-center">
-                              <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2 text-xs">
-                                {doc.type.toUpperCase()}
-                              </div>
-                              <span className="truncate">{doc.name}</span>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-slate-500 hover:text-red-500"
-                              onClick={() => removeDocument(doc.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-center mt-6">
-                    <Button 
-                      onClick={() => handleProcessFiles('label')}
-                      disabled={!selectedFiles || selectedLabels.length === 0 || isLoading}
-                      size="lg"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        "Process and Extract Figures"
-                      )}
-                    </Button>
-                  </div>
-                </div>
+                <LabelUploadTab 
+                  labels={labels}
+                  selectedFiles={selectedFiles}
+                  selectedLabels={selectedLabels}
+                  uploadedDocuments={uploadedDocuments}
+                  isLoading={isLoading}
+                  onLabelUpload={handleLabelUpload}
+                  onRemoveDocument={removeDocument}
+                  onProcess={() => handleProcessFiles('label')}
+                />
               </CardContent>
             </Card>
           </TabsContent>
