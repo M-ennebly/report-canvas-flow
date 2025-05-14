@@ -1,4 +1,3 @@
-
 import { Task } from "@/types";
 import { figureImages } from "./figureImages";
 import { almondTasksData } from "./almondTasksData";
@@ -7,7 +6,8 @@ import { taskTitles, figureTitles } from "./fallbackTaskData";
 // Generate demo tasks based on the selected labels
 export const generateDemoTasks = (
   labelId?: string, 
-  selectedLabels: string[] = []
+  selectedLabels: string[] = [],
+  reduceDuplicates: boolean = false
 ): Task[] => {
   const tasks: Task[] = [];
   const columns = labelId 
@@ -120,5 +120,33 @@ export const generateDemoTasks = (
     }
   });
 
+  // If reduceDuplicates is true, filter out some tasks with similar images
+  if (reduceDuplicates) {
+    // This would need to be implemented based on the original function
+    // For example, we could limit the number of tasks per column
+    
+    // Group tasks by column
+    const tasksByColumn = tasks.reduce((acc: Record<string, any[]>, task) => {
+      if (!acc[task.column]) {
+        acc[task.column] = [];
+      }
+      acc[task.column].push(task);
+      return acc;
+    }, {});
+    
+    // For each column with more than 3 tasks, keep only 2-3 tasks
+    const limitedTasks = [];
+    for (const column in tasksByColumn) {
+      if (tasksByColumn[column].length > 3) {
+        // Keep only 2-3 tasks per column
+        limitedTasks.push(...tasksByColumn[column].slice(0, Math.min(3, tasksByColumn[column].length)));
+      } else {
+        limitedTasks.push(...tasksByColumn[column]);
+      }
+    }
+    
+    return limitedTasks;
+  }
+  
   return tasks;
 };

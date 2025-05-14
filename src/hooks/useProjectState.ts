@@ -14,7 +14,7 @@ export const useProjectState = (
     name: "Consultant Report Project",
     description: "",
     documents: [],
-    tasks: generateDemoTasks(labelId, selectedLabels),
+    tasks: generateDemoTasks(labelId, selectedLabels, true), // Add parameter to reduce duplicates
   });
 
   // Initialize project with initial documents

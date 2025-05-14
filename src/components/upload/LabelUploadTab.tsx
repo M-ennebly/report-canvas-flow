@@ -58,7 +58,8 @@ const LabelUploadTab: React.FC<LabelUploadTabProps> = ({
       
       <DocumentsList 
         documents={uploadedDocuments} 
-        onRemoveDocument={onRemoveDocument} 
+        onRemoveDocument={onRemoveDocument}
+        showLabels={true}
       />
       
       <div className="flex justify-center mt-6">

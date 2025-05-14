@@ -3,19 +3,30 @@ import React from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
 import { FileImage, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface DocumentsListProps {
   documents: Document[];
   onRemoveDocument: (docId: string) => void;
   onExtractFigures?: (docId: string) => void;
+  showLabels?: boolean;
 }
 
 const DocumentsList: React.FC<DocumentsListProps> = ({
   documents,
   onRemoveDocument,
   onExtractFigures,
+  showLabels = false,
 }) => {
   if (documents.length === 0) return null;
+  
+  // Colors for labels
+  const labelColors: Record<string, string> = {
+    design: "bg-kanban-design text-white",
+    analyse: "bg-kanban-analyse text-white",
+    dev: "bg-kanban-dev text-white",
+    testing: "bg-kanban-testing text-white",
+  };
   
   return (
     <div className="mt-6 border rounded-md p-4 bg-white">
@@ -27,7 +38,14 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
               <div className="w-8 h-8 bg-slate-100 rounded flex items-center justify-center mr-2 text-xs">
                 {doc.type.toUpperCase()}
               </div>
-              <span className="truncate mr-2">{doc.name}</span>
+              <div className="flex items-center max-w-[70%]">
+                <span className="truncate mr-2">{doc.name}</span>
+                {showLabels && doc.label && (
+                  <Badge variant="outline" className={`ml-1 ${labelColors[doc.label] || ""}`}>
+                    {doc.label}
+                  </Badge>
+                )}
+              </div>
             </div>
             <div className="flex items-center space-x-1">
               {onExtractFigures && (

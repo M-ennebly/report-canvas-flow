@@ -54,6 +54,7 @@ const LandingPage = () => {
       type: file.name.split(".").pop() || "unknown",
       url: URL.createObjectURL(file),
       dateUploaded: new Date().toISOString(),
+      label: labelId, // Add the label to the document
     }));
     
     setLabelFiles(files);
