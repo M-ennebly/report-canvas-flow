@@ -57,6 +57,12 @@ export function useTreeViewSelection(onSelectItems: (items: SelectionState) => v
   
   // Handle mouse selection
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Don't start selection if we clicked on an interactive element
+    if ((e.target as HTMLElement).closest('button') || 
+        (e.target as HTMLElement).closest('a')) {
+      return;
+    }
+    
     setIsSelecting(true);
     const container = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - container.left;
@@ -124,6 +130,27 @@ export function useTreeViewSelection(onSelectItems: (items: SelectionState) => v
     return () => {
       resizeObserver.disconnect();
     };
+  }, []);
+
+  // Update element refs when dimensions change
+  useEffect(() => {
+    const updateElementRefs = () => {
+      // Force update of element refs next frame
+      setTimeout(() => {
+        const updatedRefs: SelectionItem[] = [];
+        elementsRef.current.forEach(item => {
+          const element = document.querySelector(`[data-id="${item.id}"][data-type="${item.type}"]`);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            updatedRefs.push({ ...item, rect });
+          }
+        });
+        elementsRef.current = updatedRefs;
+      }, 0);
+    };
+    
+    window.addEventListener('resize', updateElementRefs);
+    return () => window.removeEventListener('resize', updateElementRefs);
   }, []);
 
   return {

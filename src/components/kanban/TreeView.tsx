@@ -87,7 +87,7 @@ const TreeView: React.FC<TreeViewProps> = ({
       </div>
       
       <ScrollArea className="h-[calc(100%-56px)]">
-        <div className="p-3">
+        <div className="p-4">
           {Object.entries(tasksByColumn).map(([columnId, columnTasks]) => (
             <TreeViewColumn
               key={columnId}

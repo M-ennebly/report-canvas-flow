@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Task } from "@/types";
-import { ChevronRight, FolderIcon } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TreeViewTask from "./TreeViewTask";
 
@@ -42,27 +42,27 @@ const TreeViewColumn: React.FC<TreeViewColumnProps> = ({
   isSelecting,
 }) => {
   return (
-    <div key={columnId} className="mb-4">
+    <div key={columnId} className="mb-5">
       <div 
-        className="flex items-center cursor-pointer py-1 px-1 hover:bg-slate-50 rounded"
+        className="flex items-center cursor-pointer py-2 px-2 hover:bg-slate-50 rounded"
         onClick={() => toggleColumn(columnId)}
         ref={(el) => addElementRef(columnId, 'task', el)}
       >
         <ChevronRight
           className={cn(
-            "h-4 w-4 mr-1 transition-transform",
+            "h-5 w-5 mr-2 transition-transform",
             expandedColumns[columnId] ? "rotate-90" : ""
           )}
         />
-        <div className={`w-3 h-3 rounded-full mr-2 ${getColumnColor(columnId).split(' ')[0]}`}></div>
-        <span className="font-medium">{columnTitle}</span>
+        <div className={`w-4 h-4 rounded-full mr-2 ${getColumnColor(columnId).split(' ')[0]}`}></div>
+        <span className="font-medium text-base">{columnTitle}</span>
         <span className="ml-2 text-xs text-slate-500">
           ({columnTasks.length})
         </span>
       </div>
       
       {expandedColumns[columnId] && (
-        <div className="ml-6 border-l pl-3 space-y-1 mt-1">
+        <div className="ml-6 border-l pl-3 space-y-2 mt-2">
           {columnTasks.map(task => (
             <TreeViewTask
               key={task.id}
