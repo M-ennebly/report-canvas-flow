@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import SelectionToolbar from "../shared/SelectionToolbar";
 
 interface TreeViewToolbarProps {
   hasSelectedItems: boolean;
@@ -23,52 +23,13 @@ const TreeViewToolbar: React.FC<TreeViewToolbarProps> = ({
   if (!hasSelectedItems) return null;
   
   return (
-    <div 
-      className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white border shadow-lg p-3 rounded-lg z-50"
-      style={{ 
-        width: `${Math.min(treeViewWidth - 30, 800)}px`, 
-        maxWidth: '95%'
-      }}
-    >
-      <div className="flex flex-wrap gap-2 justify-center">
-        <span className="text-xs font-medium mr-1 whitespace-nowrap">
-          {selectedItems.tasks.length > 0 ? 
-            `${selectedItems.tasks.length} task(s) selected` : 
-            `${selectedItems.figures.length} figure(s) selected`
-          }
-        </span>
-        
-        {selectedItems.tasks.length > 0 && (
-          <>
-            {columns.map((column) => (
-              <Button 
-                key={column.id}
-                variant="outline" 
-                size="sm"
-                className="text-xs px-2 py-1 h-auto"
-              >
-                Move to {column.title}
-              </Button>
-            ))}
-            <Button 
-              variant="destructive" 
-              size="sm"
-              className="text-xs px-2 py-1 h-auto"
-            >
-              Delete
-            </Button>
-          </>
-        )}
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="text-xs px-2 py-1 h-auto"
-          onClick={onClearSelection}
-        >
-          Cancel
-        </Button>
-      </div>
-    </div>
+    <SelectionToolbar
+      selectedItems={selectedItems}
+      columns={columns}
+      containerWidth={treeViewWidth}
+      onClearSelection={onClearSelection}
+      position="absolute"
+    />
   );
 };
 
