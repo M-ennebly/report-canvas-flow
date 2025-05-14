@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
 import { FileImage, Trash2, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 interface DocumentListProps {
   documents: Document[];
@@ -16,6 +17,8 @@ const DocumentList: React.FC<DocumentListProps> = ({
   onDocumentDelete,
   onExtractFigures
 }) => {
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+
   if (documents.length === 0) return null;
 
   // Document type icons and colors
@@ -25,6 +28,16 @@ const DocumentList: React.FC<DocumentListProps> = ({
         return <div className="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">PDF</div>;
       default:
         return <div className="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center">FILE</div>;
+    }
+  };
+
+  const handleDeleteClick = (documentId: string) => {
+    setDocumentToDelete(documentId);
+  };
+
+  const handleConfirmDelete = () => {
+    if (documentToDelete && onDocumentDelete) {
+      onDocumentDelete(documentToDelete);
     }
   };
 
@@ -68,7 +81,7 @@ const DocumentList: React.FC<DocumentListProps> = ({
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => onDocumentDelete(doc.id)}
+                  onClick={() => handleDeleteClick(doc.id)}
                   className="text-slate-500 hover:text-red-500 flex-shrink-0 hover:bg-red-50"
                   title="Delete document"
                 >
@@ -79,6 +92,15 @@ const DocumentList: React.FC<DocumentListProps> = ({
           </div>
         ))}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!documentToDelete}
+        onClose={() => setDocumentToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Document"
+        description="Are you sure you want to delete this document? This action cannot be undone."
+      />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 
-import React from "react";
+import React, { useState } from "react";
 import SelectionToolbar from "../shared/SelectionToolbar";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 interface TreeViewToolbarProps {
   hasSelectedItems: boolean;

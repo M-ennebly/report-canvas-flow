@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
 import { FileImage, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 
 interface DocumentsListProps {
   documents: Document[];
@@ -18,6 +19,8 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
   onExtractFigures,
   showLabels = false,
 }) => {
+  const [documentToDelete, setDocumentToDelete] = useState<string | null>(null);
+  
   if (documents.length === 0) return null;
   
   // Colors for labels
@@ -26,6 +29,17 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
     analyse: "bg-kanban-analyse text-white",
     dev: "bg-kanban-dev text-white",
     testing: "bg-kanban-testing text-white",
+  };
+  
+  const handleDeleteClick = (docId: string) => {
+    setDocumentToDelete(docId);
+  };
+
+  const handleConfirmDelete = () => {
+    if (documentToDelete) {
+      onRemoveDocument(documentToDelete);
+      setDocumentToDelete(null);
+    }
   };
   
   return (
@@ -62,7 +76,7 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
                 variant="ghost" 
                 size="sm" 
                 className="text-slate-500 hover:text-red-500 flex-shrink-0"
-                onClick={() => onRemoveDocument(doc.id)}
+                onClick={() => handleDeleteClick(doc.id)}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -70,6 +84,15 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
           </li>
         ))}
       </ul>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!documentToDelete}
+        onClose={() => setDocumentToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Remove Document"
+        description="Are you sure you want to remove this document from the selection? You can add it again later if needed."
+      />
     </div>
   );
 };
