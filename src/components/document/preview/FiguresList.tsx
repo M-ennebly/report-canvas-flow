@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, ImagePlus, Tag, Check } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import {
   Popover,
   PopoverContent,
@@ -159,7 +159,10 @@ const FiguresList: React.FC<FiguresListProps> = ({
                         onClick={(e) => {
                           e.stopPropagation();
                           onFigureChange(figure.id, 'label', label.id);
-                          toast.success(`Figure assigned to ${label.name}`);
+                          toast({
+                            title: "Label updated",
+                            description: `Figure assigned to ${label.name}`
+                          });
                         }}
                       >
                         <span className={`w-3 h-3 rounded-full ${label.color} mr-2`}></span>
