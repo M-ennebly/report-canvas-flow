@@ -22,6 +22,7 @@ interface TreeViewColumnProps {
   toggleFigureSelection: (taskId: string, figureId: string, event: React.MouseEvent) => void;
   addElementRef: (id: string, type: 'task' | 'figure', element: HTMLDivElement | null, taskId?: string) => void;
   getColumnColor: (columnId: string) => string;
+  isSelecting: boolean;
 }
 
 const TreeViewColumn: React.FC<TreeViewColumnProps> = ({
@@ -38,6 +39,7 @@ const TreeViewColumn: React.FC<TreeViewColumnProps> = ({
   toggleFigureSelection,
   addElementRef,
   getColumnColor,
+  isSelecting,
 }) => {
   return (
     <div key={columnId} className="mb-4">
@@ -72,6 +74,7 @@ const TreeViewColumn: React.FC<TreeViewColumnProps> = ({
               toggleTaskSelection={toggleTaskSelection}
               toggleFigureSelection={toggleFigureSelection}
               addElementRef={addElementRef}
+              isSelecting={isSelecting}
             />
           ))}
         </div>

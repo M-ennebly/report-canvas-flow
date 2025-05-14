@@ -26,8 +26,8 @@ const TreeViewToolbar: React.FC<TreeViewToolbarProps> = ({
     <div 
       className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white border shadow-lg p-3 rounded-lg z-50"
       style={{ 
-        maxWidth: treeViewWidth - 30, 
-        width: 'auto' 
+        width: `${Math.min(treeViewWidth - 30, 800)}px`, 
+        maxWidth: '95%'
       }}
     >
       <div className="flex flex-wrap gap-2 justify-center">

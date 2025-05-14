@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Task } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { disableTextSelection } from "@/lib/utils";
 import TreeViewColumn from "./tree/TreeViewColumn";
 import SelectionBox from "./tree/SelectionBox";
 import TreeViewToolbar from "./tree/TreeViewToolbar";
@@ -81,7 +80,7 @@ const TreeView: React.FC<TreeViewProps> = ({
         if (isSelecting) handleMouseUp();
       }}
       ref={treeViewRef}
-      style={disableTextSelection}
+      style={{ userSelect: 'none' }}
     >
       <div className="flex justify-between items-center p-3 border-b">
         <h3 className="font-medium">File Browser View</h3>
@@ -105,6 +104,7 @@ const TreeView: React.FC<TreeViewProps> = ({
               toggleFigureSelection={toggleFigureSelection}
               addElementRef={addElementRef}
               getColumnColor={getColumnColor}
+              isSelecting={isSelecting}
             />
           ))}
         </div>

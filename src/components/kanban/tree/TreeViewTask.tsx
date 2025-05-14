@@ -16,6 +16,7 @@ interface TreeViewTaskProps {
   toggleTaskSelection: (taskId: string, event: React.MouseEvent) => void;
   toggleFigureSelection: (taskId: string, figureId: string, event: React.MouseEvent) => void;
   addElementRef: (id: string, type: 'task' | 'figure', element: HTMLDivElement | null, taskId?: string) => void;
+  isSelecting: boolean;
 }
 
 const TreeViewTask: React.FC<TreeViewTaskProps> = ({
@@ -27,6 +28,7 @@ const TreeViewTask: React.FC<TreeViewTaskProps> = ({
   toggleTaskSelection,
   toggleFigureSelection,
   addElementRef,
+  isSelecting,
 }) => {
   return (
     <div key={task.id} className="mb-1">
@@ -34,7 +36,8 @@ const TreeViewTask: React.FC<TreeViewTaskProps> = ({
         ref={(el) => addElementRef(task.id, 'task', el)}
         className={cn(
           "flex items-center cursor-pointer py-1 px-1 hover:bg-slate-50 rounded",
-          selectedItems.tasks.includes(task.id) ? "bg-blue-100" : ""
+          selectedItems.tasks.includes(task.id) && !isSelecting ? "bg-blue-100" : "",
+          selectedItems.tasks.includes(task.id) && isSelecting ? "bg-blue-200" : ""
         )}
         onClick={(e) => toggleTaskSelection(task.id, e)}
         onDoubleClick={() => onTaskClick(task.id)}
@@ -64,7 +67,8 @@ const TreeViewTask: React.FC<TreeViewTaskProps> = ({
               ref={(el) => addElementRef(figure.id, 'figure', el, task.id)}
               className={cn(
                 "flex items-center cursor-pointer py-1 px-1 hover:bg-slate-50 rounded",
-                selectedItems.figures.some(f => f.figureId === figure.id) ? "bg-blue-100" : ""
+                selectedItems.figures.some(f => f.figureId === figure.id) && !isSelecting ? "bg-blue-100" : "",
+                selectedItems.figures.some(f => f.figureId === figure.id) && isSelecting ? "bg-blue-200" : ""
               )}
               onClick={(e) => toggleFigureSelection(task.id, figure.id, e)}
             >
