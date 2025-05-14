@@ -26,9 +26,19 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
 }) => {
   const [editedTask, setEditedTask] = useState<Task | null>(null);
   const [isFiguresSectionOpen, setIsFiguresSectionOpen] = useState(true);
+  const [collapsedFigures, setCollapsedFigures] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setEditedTask(task ? { ...task } : null);
+    
+    // Initialize all figures to collapsed state by default
+    if (task && task.figures.length > 0) {
+      const initialCollapsedState = task.figures.reduce((acc, figure) => {
+        acc[figure.id] = true; // Start with all figures collapsed
+        return acc;
+      }, {} as Record<string, boolean>);
+      setCollapsedFigures(initialCollapsedState);
+    }
   }, [task]);
 
   if (!isOpen || !editedTask) {
@@ -76,6 +86,13 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
     onClose();
   };
 
+  const toggleFigureCollapse = (figureId: string) => {
+    setCollapsedFigures(prev => ({
+      ...prev,
+      [figureId]: !prev[figureId]
+    }));
+  };
+
   return (
     <div className={`fixed inset-y-0 right-0 w-full md:w-1/2 lg:w-1/3 z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"}`}>
       <div className="h-full bg-white shadow-xl border-l flex flex-col">
@@ -96,65 +113,76 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
               />
             </div>
             
-            <Collapsible 
-              open={isFiguresSectionOpen} 
-              onOpenChange={setIsFiguresSectionOpen}
-              className="w-full border rounded-md"
-            >
-              <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-3 bg-slate-50 border-b">
+            <div className="w-full border rounded-md">
+              <div className="flex items-center justify-between w-full px-4 py-3 bg-slate-50 border-b">
                 <h3 className="text-md font-medium">Figures ({editedTask.figures.length})</h3>
-                {isFiguresSectionOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </CollapsibleTrigger>
+              </div>
               
-              <CollapsibleContent className="p-4">
+              <div className="p-4">
                 <div className="space-y-4">
                   {editedTask.figures.map((figure, index) => (
-                    <div key={figure.id} className="border rounded-md p-4 space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div className="overflow-hidden rounded-md flex-grow">
-                          <AspectRatio ratio={16/9}>
-                            <img
-                              src={figure.imageUrl}
-                              alt={figure.title}
-                              className="w-full h-full object-cover rounded-md"
-                            />
-                          </AspectRatio>
+                    <Collapsible 
+                      key={figure.id} 
+                      open={!collapsedFigures[figure.id]}
+                      onOpenChange={() => toggleFigureCollapse(figure.id)}
+                      className="border rounded-md overflow-hidden"
+                    >
+                      <CollapsibleTrigger className="w-full">
+                        <div className="p-3 bg-slate-50 border-b flex justify-between items-center">
+                          <h4 className="text-sm font-medium">Figure {index + 1}</h4>
+                          {collapsedFigures[figure.id] ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronUp className="h-4 w-4" />
+                          )}
                         </div>
-                        <Button
-                          variant="ghost" 
-                          size="sm"
-                          className="text-slate-400 hover:text-red-500 ml-2"
-                          onClick={() => handleDeleteFigure(figure.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      </CollapsibleTrigger>
                       
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Figure Title</label>
-                        <Input
-                          value={figure.title}
-                          onChange={(e) => handleFigureTitleChange(figure.id, e.target.value)}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Figure Description</label>
-                        <Textarea
-                          value={figure.description}
-                          onChange={(e) => handleFigureDescriptionChange(figure.id, e.target.value)}
-                          rows={3}
-                        />
-                      </div>
-                    </div>
+                      <CollapsibleContent>
+                        <div className="p-4 space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div className="overflow-hidden rounded-md flex-grow">
+                              <AspectRatio ratio={16/9}>
+                                <img
+                                  src={figure.imageUrl}
+                                  alt={figure.title}
+                                  className="w-full h-full object-cover rounded-md"
+                                />
+                              </AspectRatio>
+                            </div>
+                            <Button
+                              variant="ghost" 
+                              size="sm"
+                              className="text-slate-400 hover:text-red-500 ml-2"
+                              onClick={() => handleDeleteFigure(figure.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Figure Title</label>
+                            <Input
+                              value={figure.title}
+                              onChange={(e) => handleFigureTitleChange(figure.id, e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Figure Description</label>
+                            <Textarea
+                              value={figure.description}
+                              onChange={(e) => handleFigureDescriptionChange(figure.id, e.target.value)}
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
                   ))}
                 </div>
-              </CollapsibleContent>
-            </Collapsible>
+              </div>
+            </div>
           </div>
         </div>
         
