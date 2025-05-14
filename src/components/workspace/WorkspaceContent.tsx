@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Task } from "@/types";
+import { Document, Task } from "@/types";
 import KanbanBoard from "@/components/kanban/KanbanBoard";
 import DocumentPanel from "@/components/document/DocumentPanel";
 import TaskEditorSidebar from "@/components/task/TaskEditorSidebar";
@@ -10,9 +10,15 @@ import { useProjectState } from "@/hooks/useProjectState";
 
 interface WorkspaceContentProps {
   labelId?: string;
+  initialDocuments?: Document[];
+  selectedLabels?: string[];
 }
 
-const WorkspaceContent: React.FC<WorkspaceContentProps> = ({ labelId }) => {
+const WorkspaceContent: React.FC<WorkspaceContentProps> = ({ 
+  labelId,
+  initialDocuments = [],
+  selectedLabels = []
+}) => {
   const {
     project,
     handleTaskMove,
@@ -21,7 +27,7 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({ labelId }) => {
     handleLinkedReportChange,
     handleDocumentUpload,
     handleDocumentDelete
-  } = useProjectState(labelId);
+  } = useProjectState(labelId, initialDocuments, selectedLabels);
 
   // State for sidebar visibility on mobile
   const [isDocPanelOpen, setIsDocPanelOpen] = useState(true);

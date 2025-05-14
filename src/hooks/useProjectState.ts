@@ -1,16 +1,20 @@
 
 import { useState } from "react";
-import { Project, Task } from "@/types";
+import { Project, Task, Document } from "@/types";
 import { generateDemoTasks } from "@/utils/demoData";
 import { toast } from "sonner";
 
-export const useProjectState = (labelId?: string) => {
+export const useProjectState = (
+  labelId?: string, 
+  initialDocuments: Document[] = [],
+  selectedLabels: string[] = []
+) => {
   const [project, setProject] = useState<Project>({
     id: "demo-project",
     name: "Consultant Report Project",
     description: "",
-    documents: [],
-    tasks: generateDemoTasks(labelId),
+    documents: initialDocuments,
+    tasks: generateDemoTasks(labelId, selectedLabels),
   });
 
   const handleTaskMove = (taskId: string, sourceColumn: string, targetColumn: string) => {
@@ -68,6 +72,7 @@ export const useProjectState = (labelId?: string) => {
       ...project,
       documents: project.documents.filter(doc => doc.id !== documentId)
     });
+    toast.success("Document deleted");
   };
 
   return {

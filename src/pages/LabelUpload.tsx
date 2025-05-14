@@ -1,17 +1,18 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, FileUp, X } from "lucide-react";
+import { Check, FileUp, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const LabelUpload = () => {
   const navigate = useNavigate();
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const labels = [
     { id: "design", name: "Design", color: "bg-kanban-design" },
@@ -20,35 +21,62 @@ const LabelUpload = () => {
     { id: "testing", name: "Testing", color: "bg-kanban-testing" }
   ];
 
-  const handleLabelSelect = (labelId: string) => {
-    setSelectedLabel(labelId);
+  const handleLabelToggle = (labelId: string) => {
+    setSelectedLabels(prev => {
+      if (prev.includes(labelId)) {
+        return prev.filter(id => id !== labelId);
+      } else {
+        return [...prev, labelId];
+      }
+    });
+  };
+
+  const handleContinue = () => {
+    if (selectedLabels.length === 0) {
+      toast.error("Please select at least one label");
+      return;
+    }
+    
     setIsDialogOpen(true);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setHasUploadedFiles(true);
+      setSelectedFiles(e.target.files);
       toast.success(`${e.target.files.length} document(s) selected`);
     }
   };
   
-  const handleUpload = () => {
-    if (!selectedLabel) {
-      toast.error("Please select a label first");
+  const handleProcessFiles = () => {
+    if (!selectedFiles || selectedFiles.length === 0) {
+      toast.error("Please select at least one file to upload");
       return;
     }
-    
-    // In a real application, we would handle the file upload here
-    toast.success("Files uploaded successfully");
-    
-    // Redirect to workspace with the selected label
-    navigate(`/workspace/label/${selectedLabel}`);
+
+    setIsLoading(true);
+
+    // Simulate processing time (in a real app, this would be an API call)
+    setTimeout(() => {
+      // Store files and selected labels in session storage
+      const filesArray = Array.from(selectedFiles).map(file => ({
+        id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        name: file.name,
+        type: file.name.split(".").pop() || "unknown",
+        url: URL.createObjectURL(file),
+        dateUploaded: new Date().toISOString(),
+      }));
+
+      sessionStorage.setItem('uploadedDocuments', JSON.stringify(filesArray));
+      sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
+      
+      // Navigate to workspace with the primary selected label
+      // Other labels will be used in the workspace
+      navigate(`/workspace/label/${selectedLabels[0]}`);
+    }, 2000);
   };
 
   const handleCancel = () => {
-    setSelectedLabel(null);
     setIsDialogOpen(false);
-    setHasUploadedFiles(false);
   };
 
   return (
@@ -65,9 +93,9 @@ const LabelUpload = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Select a Label</CardTitle>
+            <CardTitle className="text-2xl">Select Labels</CardTitle>
             <CardDescription>
-              Choose which workflow stage to upload your documents to
+              Choose which workflow stages to upload your documents to (select one or more)
             </CardDescription>
           </CardHeader>
           
@@ -78,30 +106,58 @@ const LabelUpload = () => {
                   key={label.id}
                   className={`
                     cursor-pointer p-6 rounded-lg border-2 flex flex-col items-center justify-center
-                    ${selectedLabel === label.id ? "border-blue-500" : "border-transparent"}
+                    ${selectedLabels.includes(label.id) ? "border-blue-500" : "border-transparent"}
                     hover:border-blue-300 transition-all
                   `}
-                  onClick={() => handleLabelSelect(label.id)}
+                  onClick={() => handleLabelToggle(label.id)}
                 >
                   <div className={`w-full h-2 ${label.color} rounded-full mb-3`}></div>
                   <span className="font-medium">{label.name}</span>
-                  {selectedLabel === label.id && (
-                    <Check className="text-blue-500 mt-2 h-5 w-5" />
-                  )}
+                  <div className="mt-2 flex items-center justify-center">
+                    <Checkbox
+                      checked={selectedLabels.includes(label.id)}
+                      onCheckedChange={() => handleLabelToggle(label.id)}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
+
+            <div className="flex justify-center mt-8">
+              <Button 
+                onClick={handleContinue}
+                disabled={selectedLabels.length === 0}
+              >
+                Continue to Upload
+              </Button>
+            </div>
           </CardContent>
         </Card>
+
+        {isLoading && (
+          <Card className="mt-6">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center justify-center text-center space-y-4">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                <div className="space-y-2">
+                  <h3 className="text-xl font-medium">Processing your documents</h3>
+                  <p className="text-muted-foreground">
+                    We're extracting figures and organizing them into the selected workflow stages. This may take a moment...
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Upload Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Upload Documents to {labels.find(l => l.id === selectedLabel)?.name}</DialogTitle>
+            <DialogTitle>Upload Documents to Selected Labels</DialogTitle>
             <DialogDescription>
-              The uploaded documents will be processed and figures will be added to the {labels.find(l => l.id === selectedLabel)?.name} column.
+              The uploaded documents will be processed and figures will be added to the following stages: {selectedLabels.map(id => labels.find(l => l.id === id)?.name).join(", ")}
             </DialogDescription>
           </DialogHeader>
           
@@ -125,15 +181,33 @@ const LabelUpload = () => {
                 <span>Select Files</span>
               </Button>
             </label>
+
+            {selectedFiles && (
+              <div className="mt-4 text-sm text-left">
+                <p className="font-medium mb-2">{selectedFiles.length} file(s) selected:</p>
+                <ul className="list-disc pl-5 max-h-32 overflow-y-auto">
+                  {Array.from(selectedFiles).map((file, index) => (
+                    <li key={index} className="truncate">{file.name}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
           
           <DialogFooter className="flex flex-row justify-between">
             <Button variant="outline" onClick={handleCancel}>Cancel</Button>
             <Button 
-              onClick={handleUpload}
-              disabled={!hasUploadedFiles}
+              onClick={handleProcessFiles}
+              disabled={!selectedFiles || isLoading}
             >
-              Upload and View Workspace
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Process and View Workspace"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

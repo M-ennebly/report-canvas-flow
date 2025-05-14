@@ -29,7 +29,7 @@ const LandingPage = () => {
             </p>
             <Button 
               size="lg" 
-              onClick={() => navigate("/workspace/bulk")}
+              onClick={() => navigate("/bulk-upload")}
               className="mt-4 w-full"
             >
               Start Bulk Upload
@@ -42,7 +42,7 @@ const LandingPage = () => {
             </div>
             <h2 className="text-2xl font-semibold text-slate-800">Label-Based Upload</h2>
             <p className="text-slate-600">
-              Select a specific workflow stage and upload documents directly to that stage
+              Select specific workflow stages and upload documents directly to those stages
             </p>
             <Button 
               variant="outline" 

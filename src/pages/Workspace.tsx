@@ -1,18 +1,50 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import WorkspaceHeader from "@/components/workspace/WorkspaceHeader";
 import WorkspaceContent from "@/components/workspace/WorkspaceContent";
+import { Document } from "@/types";
 
 const Workspace = () => {
   const { uploadType, labelId } = useParams<{ uploadType: string; labelId?: string }>();
   const navigate = useNavigate();
+  const [uploadedDocuments, setUploadedDocuments] = useState<Document[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
   useEffect(() => {
-    // If coming from label-based upload, set up the appropriate view
-    if (uploadType === "label" && labelId) {
-      toast.success(`Ready to upload files for the ${labelId.charAt(0).toUpperCase() + labelId.slice(1)} stage`);
+    // Check for uploaded documents in session storage
+    const storedDocuments = sessionStorage.getItem('uploadedDocuments');
+    if (storedDocuments) {
+      try {
+        const documents = JSON.parse(storedDocuments);
+        setUploadedDocuments(documents);
+        
+        // Clear session storage to prevent reloading on page refresh
+        sessionStorage.removeItem('uploadedDocuments');
+      } catch (error) {
+        console.error("Error parsing uploaded documents:", error);
+      }
+    }
+    
+    // Check for selected labels in label-based upload
+    if (uploadType === "label") {
+      const storedLabels = sessionStorage.getItem('selectedLabels');
+      if (storedLabels) {
+        try {
+          const labels = JSON.parse(storedLabels);
+          setSelectedLabels(labels);
+          
+          // Clear session storage
+          sessionStorage.removeItem('selectedLabels');
+        } catch (error) {
+          console.error("Error parsing selected labels:", error);
+        }
+      }
+      
+      if (labelId) {
+        toast.success(`Ready to work with documents for the ${labelId.charAt(0).toUpperCase() + labelId.slice(1)} stage`);
+      }
     }
   }, [uploadType, labelId]);
 
@@ -27,7 +59,11 @@ const Workspace = () => {
         labelId={labelId}
         onGenerateReport={handleGenerateReport}
       />
-      <WorkspaceContent labelId={labelId} />
+      <WorkspaceContent 
+        labelId={labelId} 
+        initialDocuments={uploadedDocuments} 
+        selectedLabels={selectedLabels}
+      />
     </div>
   );
 };
