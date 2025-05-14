@@ -55,11 +55,8 @@ export const generateDemoTasks = (
       tasks.push({
         id: taskId,
         title: `${taskType.charAt(0).toUpperCase() + taskType.slice(1)} ${i + 1}`,
-        description: `Demo ${taskType} for ${column} phase.`,
+        figures: [],  // Empty figures array as per Task interface
         column: column as "design" | "analyse" | "dev" | "testing",
-        type: taskType as "table" | "chart" | "diagram" | "image",
-        sourceDocument: `Document ${Math.floor(Math.random() * 3) + 1}`,
-        imageUrl: "/placeholder.svg"
       });
     }
   });
