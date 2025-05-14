@@ -13,6 +13,7 @@ export interface ProjectStateActions {
   handleDeleteTask: (taskId: string) => void;
   handleDeleteFigure: (taskId: string, figureId: string) => void;
   handleDescriptionChange: (description: string) => void;
+  handleNameChange: (name: string) => void;
   handleLinkedReportChange: (reportId: string) => void;
   handleDocumentUpload: (files: FileList | Document[]) => void;
   handleDocumentDelete: (documentId: string) => void;

@@ -12,6 +12,7 @@ const Workspace = () => {
   const [uploadedDocuments, setUploadedDocuments] = useState<Document[]>([]);
   const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
   const [workspaceProject, setWorkspaceProject] = useState(null);
+  const [projectName, setProjectName] = useState("Consultant Report Project");
 
   useEffect(() => {
     // Check for uploaded documents in session storage
@@ -52,6 +53,19 @@ const Workspace = () => {
         toast.success(`Ready to work with documents for the ${labelId.charAt(0).toUpperCase() + labelId.slice(1)} stage`);
       }
     }
+
+    // Check for project name in session storage
+    const storedProjectData = sessionStorage.getItem('projectData');
+    if (storedProjectData) {
+      try {
+        const projectData = JSON.parse(storedProjectData);
+        if (projectData.name) {
+          setProjectName(projectData.name);
+        }
+      } catch (error) {
+        console.error("Error parsing project data:", error);
+      }
+    }
   }, [uploadType, labelId]);
 
   const handleGenerateReport = () => {
@@ -66,7 +80,7 @@ const Workspace = () => {
   return (
     <div className="h-screen overflow-hidden flex flex-col bg-slate-100">
       <WorkspaceHeader 
-        projectName="Consultant Report Project"
+        projectName={projectName}
         labelId={labelId}
         onGenerateReport={handleGenerateReport}
         project={workspaceProject}

@@ -40,6 +40,12 @@ export const useProjectState = (
             description: projectData.description
           }));
         }
+        if (projectData.name) {
+          setProject(prev => ({
+            ...prev,
+            name: projectData.name
+          }));
+        }
       } catch (error) {
         console.error("Error loading project data:", error);
       }

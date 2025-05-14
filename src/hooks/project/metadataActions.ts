@@ -29,8 +29,26 @@ export const createMetadataActions = (
     });
   };
 
+  const handleNameChange = (name: string) => {
+    setProject({
+      ...project,
+      name,
+    });
+    
+    // Save name to session storage
+    try {
+      sessionStorage.setItem('projectData', JSON.stringify({
+        ...JSON.parse(sessionStorage.getItem('projectData') || '{}'),
+        name
+      }));
+    } catch (error) {
+      console.error("Error saving project name:", error);
+    }
+  };
+
   return {
     handleDescriptionChange,
-    handleLinkedReportChange
+    handleLinkedReportChange,
+    handleNameChange
   };
 };
