@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Task } from "@/types";
 import { ChevronRight, FolderIcon, File, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,9 +38,6 @@ const TreeView: React.FC<TreeViewProps> = ({
     figures: []
   });
   
-  // State for selection mode
-  const [isSelectMode, setIsSelectMode] = useState(false);
-  
   // State for tracking mouse selection
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState({ x: 0, y: 0 });
@@ -53,6 +50,9 @@ const TreeView: React.FC<TreeViewProps> = ({
     taskId?: string;
     rect: DOMRect;
   }[]>([]);
+
+  // Track tree view container reference
+  const treeViewRef = React.useRef<HTMLDivElement>(null);
 
   // Group tasks by column
   const tasksByColumn = columns.reduce((acc, column) => {
@@ -84,8 +84,6 @@ const TreeView: React.FC<TreeViewProps> = ({
   
   // Handle item selection
   const toggleTaskSelection = (taskId: string, event: React.MouseEvent) => {
-    if (!isSelectMode) return;
-    
     event.stopPropagation();
     
     setSelectedItems(prev => {
@@ -114,8 +112,6 @@ const TreeView: React.FC<TreeViewProps> = ({
   };
   
   const toggleFigureSelection = (taskId: string, figureId: string, event: React.MouseEvent) => {
-    if (!isSelectMode) return;
-    
     event.stopPropagation();
     
     setSelectedItems(prev => {
@@ -145,8 +141,6 @@ const TreeView: React.FC<TreeViewProps> = ({
   
   // Handle mouse selection
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isSelectMode) return;
-    
     setIsSelecting(true);
     const container = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - container.left;
@@ -157,7 +151,7 @@ const TreeView: React.FC<TreeViewProps> = ({
   };
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isSelecting || !isSelectMode) return;
+    if (!isSelecting) return;
     
     const container = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - container.left;
@@ -172,7 +166,7 @@ const TreeView: React.FC<TreeViewProps> = ({
   };
   
   const handleMouseUp = () => {
-    if (!isSelecting || !isSelectMode) return;
+    if (!isSelecting) return;
     
     // Calculate which items fall within the selection box
     const selectionBoxRect = {
@@ -219,7 +213,7 @@ const TreeView: React.FC<TreeViewProps> = ({
   };
   
   // Add ref to track element position
-  const addElementRef = (id: string, type: 'task' | 'figure', taskId?: string, element: HTMLDivElement | null) => {
+  const addElementRef = (id: string, type: 'task' | 'figure', element: HTMLDivElement | null, taskId?: string) => {
     if (!element) return;
     
     const rect = element.getBoundingClientRect();
@@ -241,35 +235,47 @@ const TreeView: React.FC<TreeViewProps> = ({
       default: return "bg-slate-400 text-white";
     }
   };
-  
-  // Enable or disable selection mode
-  const toggleSelectionMode = () => {
-    setIsSelectMode(!isSelectMode);
-    if (isSelectMode) {
-      // Clear selections when disabling selection mode
-      setSelectedItems({tasks: [], figures: []});
-      onSelectItems({tasks: [], figures: []});
+
+  // Get width of tree view container for the toolbar
+  const [treeViewWidth, setTreeViewWidth] = useState(0);
+
+  // Update width on resize
+  useEffect(() => {
+    const updateWidth = () => {
+      if (treeViewRef.current) {
+        setTreeViewWidth(treeViewRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    
+    // Add resize observer
+    const resizeObserver = new ResizeObserver(updateWidth);
+    if (treeViewRef.current) {
+      resizeObserver.observe(treeViewRef.current);
     }
-  };
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+  
+  // Check if any items are selected
+  const hasSelectedItems = selectedItems.tasks.length > 0 || selectedItems.figures.length > 0;
 
   return (
-    <div className="bg-white rounded-lg border shadow-sm h-[calc(100vh-220px)] relative" 
+    <div 
+      className="bg-white rounded-lg border shadow-sm h-[calc(100vh-220px)] relative select-none" 
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={() => {
         if (isSelecting) handleMouseUp();
-      }}>
+      }}
+      ref={treeViewRef}
+    >
       <div className="flex justify-between items-center p-3 border-b">
         <h3 className="font-medium">File Browser View</h3>
-        <Button
-          variant={isSelectMode ? "secondary" : "outline"}
-          size="sm"
-          onClick={toggleSelectionMode}
-        >
-          <CheckSquare className="h-4 w-4 mr-1" />
-          {isSelectMode ? "Cancel Selection" : "Select Items"}
-        </Button>
       </div>
       
       <ScrollArea className="h-[calc(100%-56px)]">
@@ -279,7 +285,7 @@ const TreeView: React.FC<TreeViewProps> = ({
               <div 
                 className="flex items-center cursor-pointer py-1 px-1 hover:bg-slate-50 rounded"
                 onClick={() => toggleColumn(columnId)}
-                ref={(el) => addElementRef(columnId, 'task', undefined, el)}
+                ref={(el) => addElementRef(columnId, 'task', el)}
               >
                 <ChevronRight
                   className={cn(
@@ -299,12 +305,12 @@ const TreeView: React.FC<TreeViewProps> = ({
                   {columnTasks.map(task => (
                     <div key={task.id} className="mb-1">
                       <div 
-                        ref={(el) => addElementRef(task.id, 'task', undefined, el)}
+                        ref={(el) => addElementRef(task.id, 'task', el)}
                         className={cn(
                           "flex items-center cursor-pointer py-1 px-1 hover:bg-slate-50 rounded",
                           selectedItems.tasks.includes(task.id) ? "bg-blue-100" : ""
                         )}
-                        onClick={(e) => isSelectMode ? toggleTaskSelection(task.id, e) : toggleTask(task.id)}
+                        onClick={(e) => toggleTaskSelection(task.id, e)}
                         onDoubleClick={() => onTaskClick(task.id)}
                       >
                         <ChevronRight
@@ -329,12 +335,12 @@ const TreeView: React.FC<TreeViewProps> = ({
                           {task.figures.map(figure => (
                             <div 
                               key={figure.id}
-                              ref={(el) => addElementRef(figure.id, 'figure', task.id, el)}
+                              ref={(el) => addElementRef(figure.id, 'figure', el, task.id)}
                               className={cn(
                                 "flex items-center cursor-pointer py-1 px-1 hover:bg-slate-50 rounded",
                                 selectedItems.figures.some(f => f.figureId === figure.id) ? "bg-blue-100" : ""
                               )}
-                              onClick={(e) => isSelectMode ? toggleFigureSelection(task.id, figure.id, e) : null}
+                              onClick={(e) => toggleFigureSelection(task.id, figure.id, e)}
                             >
                               <File className="h-4 w-4 mr-1 text-blue-500" />
                               <span className="text-sm truncate">{figure.title}</span>
@@ -362,6 +368,59 @@ const TreeView: React.FC<TreeViewProps> = ({
             height: selectionBox.height
           }}
         />
+      )}
+
+      {/* Floating Action Toolbar */}
+      {hasSelectedItems && (
+        <div 
+          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white border shadow-lg p-3 rounded-lg z-50"
+          style={{ 
+            maxWidth: treeViewWidth - 30, 
+            width: 'auto' 
+          }}
+        >
+          <div className="flex flex-wrap gap-2 justify-center">
+            <span className="text-xs font-medium mr-1 whitespace-nowrap">
+              {selectedItems.tasks.length > 0 ? 
+                `${selectedItems.tasks.length} task(s) selected` : 
+                `${selectedItems.figures.length} figure(s) selected`
+              }
+            </span>
+            
+            {selectedItems.tasks.length > 0 && (
+              <>
+                {columns.map((column) => (
+                  <Button 
+                    key={column.id}
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs px-2 py-1 h-auto"
+                  >
+                    Move to {column.title}
+                  </Button>
+                ))}
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  className="text-xs px-2 py-1 h-auto"
+                >
+                  Delete
+                </Button>
+              </>
+            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="text-xs px-2 py-1 h-auto"
+              onClick={() => {
+                setSelectedItems({tasks: [], figures: []});
+                onSelectItems({tasks: [], figures: []});
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

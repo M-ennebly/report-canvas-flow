@@ -4,7 +4,6 @@ import { Task } from "@/types";
 import Column from "./Column";
 import ListView from "./ListView";
 import TreeView from "./TreeView";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Kanban, List, FolderTree } from "lucide-react";
 
@@ -155,8 +154,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
         />
       )}
       
-      {/* Action Toolbar */}
-      {showActionToolbar && (
+      {/* Action Toolbar - Only show in Kanban and List views */}
+      {showActionToolbar && viewMode !== "tree" && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 flex items-center justify-between z-50">
           <div className="flex items-center">
             <span className="text-sm font-medium mr-3">
