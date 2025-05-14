@@ -2,6 +2,7 @@
 import React, { useRef } from "react";
 import { Document } from "@/types";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FilePreviewProps {
   document: Document | null;
@@ -34,35 +35,37 @@ const FilePreview: React.FC<FilePreviewProps> = ({
   // Render file preview based on type
   if (isImage) {
     return (
-      <div 
-        ref={previewRef}
-        className="relative w-full h-full overflow-hidden bg-slate-100"
-        style={{ cursor: croppingMode ? 'crosshair' : 'default' }}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-      >
-        <div className="h-full w-full flex items-center justify-center">
-          <img
-            src={document.url}
-            alt={document.name}
-            className="max-h-full max-w-full object-contain"
-          />
+      <ScrollArea className="h-full w-full">
+        <div 
+          ref={previewRef}
+          className="relative min-h-full min-w-full overflow-visible bg-slate-100"
+          style={{ cursor: croppingMode ? 'crosshair' : 'default' }}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+        >
+          <div className="p-4 flex items-center justify-center">
+            <img
+              src={document.url}
+              alt={document.name}
+              className="max-w-full object-contain"
+            />
+          </div>
+          
+          {cropStart && cropEnd && (
+            <div
+              className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
+              style={{
+                left: Math.min(cropStart.x, cropEnd.x),
+                top: Math.min(cropStart.y, cropEnd.y),
+                width: Math.abs(cropEnd.x - cropStart.x),
+                height: Math.abs(cropEnd.y - cropStart.y)
+              }}
+            />
+          )}
         </div>
-        
-        {cropStart && cropEnd && (
-          <div
-            className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
-            style={{
-              left: Math.min(cropStart.x, cropEnd.x),
-              top: Math.min(cropStart.y, cropEnd.y),
-              width: Math.abs(cropEnd.x - cropStart.x),
-              height: Math.abs(cropEnd.y - cropStart.y)
-            }}
-          />
-        )}
-      </div>
+      </ScrollArea>
     );
   } else if (document.type === "pdf") {
     return (

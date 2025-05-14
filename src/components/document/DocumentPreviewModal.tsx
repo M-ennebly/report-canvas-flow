@@ -45,7 +45,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(document?.type.toLowerCase() || "");
 
   const handleStartCrop = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!croppingMode || !previewRef.current) return;
+    if (!croppingMode) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -56,7 +56,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   };
 
   const handleCropMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!croppingMode || !cropStart || !previewRef.current) return;
+    if (!croppingMode || !cropStart) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
     const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
@@ -149,7 +149,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[90%] sm:w-[90%] max-h-[90vh] h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[95%] sm:w-[95%] max-h-[95vh] h-[95vh] flex flex-col p-0 gap-0 overflow-hidden">
         <div className="p-6 pb-2">
           <DocumentPreviewHeader documentName={document?.name} />
         </div>
