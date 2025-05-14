@@ -7,6 +7,7 @@ import { Document } from "@/types";
 import Header from "@/components/layout/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import EnhancedUploadSection from "@/components/upload/EnhancedUploadSection";
+import LoadingScreen from "@/components/ui/loading-screen";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -76,15 +77,18 @@ const LandingPage = () => {
 
     setIsLoading(true);
 
-    // Store the appropriate documents in sessionStorage and navigate immediately
-    if (uploadType === 'bulk') {
-      sessionStorage.setItem('uploadedDocuments', JSON.stringify(bulkDocuments));
-      navigate("/workspace/bulk");
-    } else {
-      sessionStorage.setItem('uploadedDocuments', JSON.stringify(labelDocuments));
-      sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
-      navigate(`/workspace/label/${selectedLabels[0]}`);
-    }
+    // Simulate processing time with a delay before navigation
+    setTimeout(() => {
+      // Store the appropriate documents in sessionStorage and navigate
+      if (uploadType === 'bulk') {
+        sessionStorage.setItem('uploadedDocuments', JSON.stringify(bulkDocuments));
+        navigate("/workspace/bulk");
+      } else {
+        sessionStorage.setItem('uploadedDocuments', JSON.stringify(labelDocuments));
+        sessionStorage.setItem('selectedLabels', JSON.stringify(selectedLabels));
+        navigate(`/workspace/label/${selectedLabels[0]}`);
+      }
+    }, 1500); // 1.5 second delay for visual feedback
   };
 
   const removeBulkDocument = (docId: string) => {
@@ -134,6 +138,9 @@ const LandingPage = () => {
         removeBulkDocument={removeBulkDocument}
         removeLabelDocument={removeLabelDocument}
       />
+      
+      {/* Loading Screen */}
+      <LoadingScreen isOpen={isLoading} />
     </div>
   );
 };
