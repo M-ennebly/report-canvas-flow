@@ -7,6 +7,7 @@ import {
 import { useDocumentType } from "./useDocumentType";
 import { useCroppingState } from "./useCroppingState";
 import { useFiguresState } from "./useFiguresState";
+import { useCallback } from "react";
 
 export function useDocumentPreview(
   document: Document | null,

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useCallback } from "react";
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Document } from "@/types";
@@ -24,6 +24,9 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   onClose,
   onSaveFigures,
 }) => {
+  // Safeguard to prevent hooks from running when document is null
+  const documentId = document?.id || null;
+  
   const {
     isImage,
     croppingMode,
@@ -43,7 +46,7 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     handleSave
   } = useDocumentPreview(document, onSaveFigures);
 
-  const handleSaveAndClose = () => {
+  const handleSaveAndClose = useCallback(() => {
     // Check if figures exist
     if (croppedFigures.length === 0) {
       toast({
@@ -58,13 +61,18 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     const saveSuccess = handleSave();
     
     // Only close the modal if save was successful
-    if (saveSuccess === true) {
+    if (saveSuccess) {
       onClose();
     }
-  };
+  }, [croppedFigures, handleSave, onClose]);
+
+  // If modal is not open, don't render anything to prevent hooks from running
+  if (!isOpen || !document) {
+    return null;
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[95%] sm:w-[95%] max-h-[95vh] h-[95vh] flex flex-col p-0 gap-0 overflow-hidden">
         <div className="p-6 pb-2">
           <DocumentPreviewHeader documentName={document?.name} />

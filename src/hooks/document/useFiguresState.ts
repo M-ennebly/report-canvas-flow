@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { CroppedFigure } from "./types";
 import { Document } from "@/types";
 import { useFigureUtils } from "./figureUtils";
@@ -23,11 +23,8 @@ export function useFiguresState(
   const [activeFigureId, setActiveFigureId] = useState<string | null>(null);
 
   // Reset state when document changes
-  useEffect(() => {
-    setCroppedFigures([]);
-    setActiveFigureId(null);
-  }, [document?.id]);
-
+  // We removed the useEffect hook that was causing issues
+  
   const { 
     validateFigures, 
     showValidationError, 
@@ -36,25 +33,23 @@ export function useFiguresState(
     deleteFigure
   } = useFigureUtils();
 
-  const handleFigureChange = (id: string, field: 'title' | 'description' | 'label', value: string) => {
+  const handleFigureChange = useCallback((id: string, field: 'title' | 'description' | 'label', value: string) => {
     setCroppedFigures(currentFigures => 
       updateFigureField(currentFigures, id, field, value)
     );
-  };
+  }, [updateFigureField]);
 
-  const handleDeleteFigure = (id: string) => {
+  const handleDeleteFigure = useCallback((id: string) => {
     setCroppedFigures(currentFigures => deleteFigure(currentFigures, id));
-    if (activeFigureId === id) {
-      setActiveFigureId(null);
-    }
-  };
+    setActiveFigureId((current) => current === id ? null : current);
+  }, [deleteFigure]);
 
-  const addFigure = (figure: CroppedFigure) => {
+  const addFigure = useCallback((figure: CroppedFigure) => {
     setCroppedFigures(prev => [...prev, figure]);
     setActiveFigureId(figure.id);
-  };
+  }, []);
 
-  const handleSave = (): boolean => {
+  const handleSave = useCallback((): boolean => {
     try {
       // Validate figures have titles
       const { valid, index } = validateFigures(croppedFigures);
@@ -79,7 +74,7 @@ export function useFiguresState(
       });
       return false;
     }
-  };
+  }, [croppedFigures, onSaveFigures, showSaveSuccess, showValidationError, validateFigures]);
 
   return {
     croppedFigures,
