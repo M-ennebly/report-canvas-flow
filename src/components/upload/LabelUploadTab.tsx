@@ -34,18 +34,20 @@ const LabelUploadTab: React.FC<LabelUploadTabProps> = ({
   onProcess,
 }) => {
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold text-slate-800">Upload to Specific Workflow Stages</h2>
-      <p className="text-slate-600">
-        Select specific workflow stages and upload documents directly to those stages
-      </p>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-semibold text-slate-800">Upload to Specific Workflow Stages</h2>
+        <p className="text-slate-600 mt-1">
+          Select specific workflow stages and upload documents directly to those stages
+        </p>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {labels.map((label) => (
-          <div key={label.id} className="space-y-3">
-            <div className="flex items-center space-x-2">
+          <div key={label.id} className="bg-white rounded-lg border border-slate-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-3">
               <div className={`w-4 h-4 ${label.color} rounded-full`}></div>
-              <h3 className="font-medium">{label.name}</h3>
+              <h3 className="font-medium ml-2">{label.name}</h3>
             </div>
             <UploadDropzone
               onFilesSelected={(files) => onLabelUpload(files, label.id)}
@@ -62,11 +64,12 @@ const LabelUploadTab: React.FC<LabelUploadTabProps> = ({
         showLabels={true}
       />
       
-      <div className="flex justify-center mt-6">
+      <div className="flex justify-center mt-8">
         <Button 
           onClick={onProcess}
           disabled={uploadedDocuments.length === 0 || selectedLabels.length === 0 || isLoading}
           size="lg"
+          className="px-8"
         >
           {isLoading ? (
             <>
