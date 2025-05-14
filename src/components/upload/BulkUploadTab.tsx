@@ -13,6 +13,7 @@ interface BulkUploadTabProps {
   onFilesSelected: (files: FileList) => void;
   onRemoveDocument: (docId: string) => void;
   onProcess: () => void;
+  onExtractFigures?: (docId: string) => void;
 }
 
 const BulkUploadTab: React.FC<BulkUploadTabProps> = ({
@@ -22,6 +23,7 @@ const BulkUploadTab: React.FC<BulkUploadTabProps> = ({
   onFilesSelected,
   onRemoveDocument,
   onProcess,
+  onExtractFigures,
 }) => {
   return (
     <div className="space-y-4">
@@ -37,7 +39,8 @@ const BulkUploadTab: React.FC<BulkUploadTabProps> = ({
       
       <DocumentsList 
         documents={uploadedDocuments} 
-        onRemoveDocument={onRemoveDocument} 
+        onRemoveDocument={onRemoveDocument}
+        onExtractFigures={onExtractFigures}
       />
       
       <div className="flex justify-center mt-6">

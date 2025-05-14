@@ -3,14 +3,22 @@ import React from "react";
 import { Task } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface TaskCardProps {
   task: Task;
   onClick: () => void;
   onDragStart: (e: React.DragEvent) => void;
+  onDelete?: () => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDragStart }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDragStart, onDelete }) => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click event
+    if (onDelete) onDelete();
+  };
+
   return (
     <Card 
       className="cursor-pointer hover:shadow-md transition-shadow"
@@ -19,9 +27,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDragStart }) => {
       onDragStart={onDragStart}
     >
       <CardContent className="p-3">
-        <div className="mb-2 border-b pb-1">
-          <span className="text-xs text-slate-500 uppercase tracking-wider">Task</span>
-          <h4 className="font-medium text-slate-800">{task.title}</h4>
+        <div className="mb-2 border-b pb-1 flex items-center justify-between">
+          <div>
+            <span className="text-xs text-slate-500 uppercase tracking-wider">Task</span>
+            <h4 className="font-medium text-slate-800">{task.title}</h4>
+          </div>
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-slate-400 hover:text-red-500"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">Delete task</span>
+            </Button>
+          )}
         </div>
         
         <div className="space-y-2">

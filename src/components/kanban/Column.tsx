@@ -8,6 +8,7 @@ interface ColumnProps {
   tasks: Task[];
   columnId: "design" | "analyse" | "dev" | "testing";
   onTaskClick: (taskId: string) => void;
+  onTaskDelete: (taskId: string) => void;
   onDragStart: (e: React.DragEvent, taskId: string, sourceColumn: string) => void;
   onDragOver: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent, columnId: string) => void;
@@ -18,6 +19,7 @@ const Column: React.FC<ColumnProps> = ({
   tasks,
   columnId,
   onTaskClick,
+  onTaskDelete,
   onDragStart,
   onDragOver,
   onDrop,
@@ -58,6 +60,7 @@ const Column: React.FC<ColumnProps> = ({
                 key={task.id}
                 task={task}
                 onClick={() => onTaskClick(task.id)}
+                onDelete={() => onTaskDelete(task.id)}
                 onDragStart={(e) => onDragStart(e, task.id, columnId)}
               />
             ))}

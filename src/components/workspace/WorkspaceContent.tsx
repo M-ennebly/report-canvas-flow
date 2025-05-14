@@ -23,10 +23,13 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
     project,
     handleTaskMove,
     handleSaveTask,
+    handleDeleteTask,
+    handleDeleteFigure,
     handleDescriptionChange,
     handleLinkedReportChange,
     handleDocumentUpload,
-    handleDocumentDelete
+    handleDocumentDelete,
+    handleExtractFigures
   } = useProjectState(labelId, initialDocuments, selectedLabels);
 
   // State for sidebar visibility on mobile
@@ -54,6 +57,7 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
           onLinkedReportChange={handleLinkedReportChange}
           onDocumentUpload={handleDocumentUpload}
           onDocumentDelete={handleDocumentDelete}
+          onExtractFigures={handleExtractFigures}
         />
       </div>
 
@@ -63,6 +67,7 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
           tasks={project.tasks} 
           onTaskClick={handleTaskClick}
           onTaskMove={handleTaskMove}
+          onTaskDelete={handleDeleteTask}
         />
       </div>
 
@@ -75,6 +80,7 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
         onLinkedReportChange={handleLinkedReportChange}
         onDocumentUpload={handleDocumentUpload}
         onDocumentDelete={handleDocumentDelete}
+        onExtractFigures={handleExtractFigures}
       />
 
       {/* Document Panel Toggle for Mobile */}
@@ -86,6 +92,7 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
         isOpen={isEditorOpen}
         onClose={() => setIsEditorOpen(false)}
         onSave={handleSaveTask}
+        onDeleteFigure={handleDeleteFigure}
       />
     </div>
   );

@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Task, Figure } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -13,6 +14,7 @@ interface TaskEditorSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedTask: Task) => void;
+  onDeleteFigure?: (taskId: string, figureId: string) => void;
 }
 
 const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
@@ -20,6 +22,7 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
   isOpen,
   onClose,
   onSave,
+  onDeleteFigure,
 }) => {
   const [editedTask, setEditedTask] = useState<Task | null>(null);
   const [isFiguresSectionOpen, setIsFiguresSectionOpen] = useState(true);
@@ -52,6 +55,19 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
         figure.id === figureId ? { ...figure, description: value } : figure
       ),
     });
+  };
+
+  const handleDeleteFigure = (figureId: string) => {
+    if (onDeleteFigure && task) {
+      onDeleteFigure(task.id, figureId);
+      onClose();
+    } else {
+      // If no external delete handler, just update local state
+      setEditedTask({
+        ...editedTask,
+        figures: editedTask.figures.filter(figure => figure.id !== figureId)
+      });
+    }
   };
 
   const handleSave = () => {
@@ -98,14 +114,24 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
                 <div className="space-y-4">
                   {editedTask.figures.map((figure, index) => (
                     <div key={figure.id} className="border rounded-md p-4 space-y-3">
-                      <div className="overflow-hidden rounded-md">
-                        <AspectRatio ratio={16/9}>
-                          <img
-                            src={figure.imageUrl}
-                            alt={figure.title}
-                            className="w-full h-full object-cover rounded-md"
-                          />
-                        </AspectRatio>
+                      <div className="flex justify-between items-start">
+                        <div className="overflow-hidden rounded-md flex-grow">
+                          <AspectRatio ratio={16/9}>
+                            <img
+                              src={figure.imageUrl}
+                              alt={figure.title}
+                              className="w-full h-full object-cover rounded-md"
+                            />
+                          </AspectRatio>
+                        </div>
+                        <Button
+                          variant="ghost" 
+                          size="sm"
+                          className="text-slate-400 hover:text-red-500 ml-2"
+                          onClick={() => handleDeleteFigure(figure.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                       
                       <div className="space-y-2">

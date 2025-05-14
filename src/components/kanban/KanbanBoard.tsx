@@ -11,12 +11,14 @@ interface KanbanBoardProps {
   tasks: Task[];
   onTaskClick: (taskId: string) => void;
   onTaskMove: (taskId: string, sourceColumn: string, targetColumn: string) => void;
+  onTaskDelete: (taskId: string) => void;
 }
 
 const KanbanBoard: React.FC<KanbanBoardProps> = ({
   tasks,
   onTaskClick,
   onTaskMove,
+  onTaskDelete,
 }) => {
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [sourceColumn, setSourceColumn] = useState<string | null>(null);
@@ -79,6 +81,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
               tasks={getTasksByColumn(column.id)}
               columnId={column.id}
               onTaskClick={onTaskClick}
+              onTaskDelete={onTaskDelete}
               onDragStart={handleDragStart}
               onDragOver={handleDragOver}
               onDrop={handleDrop}
@@ -92,6 +95,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           tasks={tasks}
           columns={columns}
           onTaskClick={onTaskClick}
+          onTaskDelete={onTaskDelete}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Project, Task, Document } from "@/types";
+import { Project, Task, Document, Figure } from "@/types";
 import { generateDemoTasks } from "@/utils/demoData";
 import { toast } from "sonner";
 
@@ -37,6 +37,26 @@ export const useProjectState = (
       ),
     });
     toast.success(`Task moved to ${targetColumn}`);
+  };
+
+  const handleDeleteTask = (taskId: string) => {
+    setProject({
+      ...project,
+      tasks: project.tasks.filter(task => task.id !== taskId)
+    });
+    toast.success("Task deleted");
+  };
+
+  const handleDeleteFigure = (taskId: string, figureId: string) => {
+    setProject({
+      ...project,
+      tasks: project.tasks.map(task => 
+        task.id === taskId 
+          ? { ...task, figures: task.figures.filter(figure => figure.id !== figureId) }
+          : task
+      )
+    });
+    toast.success("Figure deleted");
   };
 
   const handleSaveTask = (updatedTask: Task) => {
@@ -99,13 +119,63 @@ export const useProjectState = (
     toast.success("Document deleted");
   };
 
+  const handleExtractFigures = (documentId: string) => {
+    // In a real app, this would call an API to extract figures from the document
+    // For demo purposes, we'll create some random figures and add them to a new task
+    const document = project.documents.find(doc => doc.id === documentId);
+    if (!document) return;
+    
+    const newTaskId = `task-extract-${Date.now()}`;
+    const columnChoices = ["design", "analyse", "dev", "testing"];
+    const randomColumn = columnChoices[Math.floor(Math.random() * columnChoices.length)] as "design" | "analyse" | "dev" | "testing";
+    
+    // Create 2-4 random figures
+    const figureCount = Math.floor(Math.random() * 3) + 2;
+    const figures: Figure[] = [];
+    
+    // Select appropriate category based on document type
+    let category = "fallback";
+    if (document.type === "pdf") category = "analysis";
+    if (document.type === "docx") category = "quality";
+    if (document.type === "pptx") category = "optical";
+    
+    for (let i = 0; i < figureCount; i++) {
+      figures.push({
+        id: `figure-${newTaskId}-${i}`,
+        title: `Extracted Figure ${i+1} from ${document.name}`,
+        description: `Figure automatically extracted from ${document.name}`,
+        imageUrl: require(`@/utils/figureImages`).figureImages[category][i % 3],
+        pageNumber: Math.floor(Math.random() * 10) + 1,
+        documentId: document.id
+      });
+    }
+    
+    // Create new task with the extracted figures
+    const newTask = {
+      id: newTaskId,
+      title: `Figures from ${document.name}`,
+      figures,
+      column: randomColumn
+    };
+    
+    setProject({
+      ...project,
+      tasks: [...project.tasks, newTask]
+    });
+    
+    toast.success(`Extracted ${figureCount} figures from ${document.name}`);
+  };
+
   return {
     project,
     handleTaskMove,
     handleSaveTask,
+    handleDeleteTask,
+    handleDeleteFigure,
     handleDescriptionChange,
     handleLinkedReportChange,
     handleDocumentUpload,
-    handleDocumentDelete
+    handleDocumentDelete,
+    handleExtractFigures
   };
 };

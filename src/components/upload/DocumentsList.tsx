@@ -2,16 +2,18 @@
 import React from "react";
 import { Document } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { FileImage, Trash2 } from "lucide-react";
 
 interface DocumentsListProps {
   documents: Document[];
   onRemoveDocument: (docId: string) => void;
+  onExtractFigures?: (docId: string) => void;
 }
 
 const DocumentsList: React.FC<DocumentsListProps> = ({
   documents,
   onRemoveDocument,
+  onExtractFigures,
 }) => {
   if (documents.length === 0) return null;
   
@@ -27,14 +29,26 @@ const DocumentsList: React.FC<DocumentsListProps> = ({
               </div>
               <span className="truncate mr-2">{doc.name}</span>
             </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-slate-500 hover:text-red-500 flex-shrink-0"
-              onClick={() => onRemoveDocument(doc.id)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center space-x-1">
+              {onExtractFigures && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="text-slate-700 flex-shrink-0"
+                  onClick={() => onExtractFigures(doc.id)}
+                >
+                  <FileImage className="h-4 w-4 mr-1" /> Extract Figures
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-slate-500 hover:text-red-500 flex-shrink-0"
+                onClick={() => onRemoveDocument(doc.id)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </li>
         ))}
       </ul>

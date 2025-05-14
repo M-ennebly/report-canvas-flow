@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FileUp, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { FileUp, FileImage, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ interface DocumentPanelProps {
   onLinkedReportChange: (reportId: string) => void;
   onDocumentUpload: (files: FileList) => void;
   onDocumentDelete?: (documentId: string) => void;
+  onExtractFigures?: (documentId: string) => void;
 }
 
 const DocumentPanel: React.FC<DocumentPanelProps> = ({
@@ -23,6 +24,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   onLinkedReportChange,
   onDocumentUpload,
   onDocumentDelete,
+  onExtractFigures
 }) => {
   const [description, setDescription] = useState(project.description || "");
 
@@ -101,16 +103,30 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
                       <p className="truncate mr-2">{doc.name}</p>
                     </div>
                   </div>
-                  {onDocumentDelete && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleDeleteDocument(doc.id)}
-                      className="text-slate-500 hover:text-red-500 flex-shrink-0"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <div className="flex space-x-1">
+                    {onExtractFigures && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => onExtractFigures(doc.id)}
+                        className="text-slate-500 hover:text-blue-500 flex-shrink-0"
+                        title="Extract figures"
+                      >
+                        <FileImage className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {onDocumentDelete && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        className="text-slate-500 hover:text-red-500 flex-shrink-0"
+                        title="Delete document"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
