@@ -5,6 +5,7 @@ import Column from "./Column";
 import ListView from "./ListView";
 import TreeView from "./TreeView";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { Kanban, List, FolderTree } from "lucide-react";
 
 interface KanbanBoardProps {
