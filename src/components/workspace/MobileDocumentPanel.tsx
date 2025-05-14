@@ -11,6 +11,7 @@ interface MobileDocumentPanelProps {
   onLinkedReportChange: (reportId: string) => void;
   onDocumentUpload: (files: FileList) => void;
   onDocumentDelete: (documentId: string) => void;
+  onExtractFigures: (documentId: string) => void;
 }
 
 const MobileDocumentPanel: React.FC<MobileDocumentPanelProps> = ({
@@ -20,7 +21,8 @@ const MobileDocumentPanel: React.FC<MobileDocumentPanelProps> = ({
   onDescriptionChange,
   onLinkedReportChange,
   onDocumentUpload,
-  onDocumentDelete
+  onDocumentDelete,
+  onExtractFigures
 }) => {
   if (!isOpen) return null;
 
@@ -39,6 +41,7 @@ const MobileDocumentPanel: React.FC<MobileDocumentPanelProps> = ({
           onLinkedReportChange={onLinkedReportChange}
           onDocumentUpload={onDocumentUpload}
           onDocumentDelete={onDocumentDelete}
+          onExtractFigures={onExtractFigures}
         />
       </div>
     </div>

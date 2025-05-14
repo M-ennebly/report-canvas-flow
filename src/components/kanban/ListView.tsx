@@ -10,9 +10,10 @@ interface ListViewProps {
   tasks: Task[];
   columns: { id: string; title: string }[];
   onTaskClick: (taskId: string) => void;
+  onTaskDelete: (taskId: string) => void;
 }
 
-const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick }) => {
+const ListView: React.FC<ListViewProps> = ({ tasks, columns, onTaskClick, onTaskDelete }) => {
   // Group tasks by column
   const tasksByColumn = columns.map(column => ({
     ...column,
