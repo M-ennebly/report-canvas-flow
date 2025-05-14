@@ -17,7 +17,7 @@ const UploadDropzone: React.FC<UploadDropzoneProps> = ({
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       onFilesSelected(e.target.files);
-      e.target.value = ""; // Reset input
+      e.target.value = ""; // Reset input so the same files can be selected again
     }
   };
 

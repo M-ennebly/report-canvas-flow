@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileUp, Tag } from "lucide-react";
+import { FileUp, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,7 +41,8 @@ const LandingPage = () => {
     }));
     
     setBulkFiles(files);
-    setBulkDocuments(newDocs);
+    // Append new documents to existing ones instead of replacing
+    setBulkDocuments(prevDocs => [...prevDocs, ...newDocs]);
     toast.success(`${files.length} document(s) selected`);
   };
 
@@ -56,7 +57,8 @@ const LandingPage = () => {
     }));
     
     setLabelFiles(files);
-    setLabelDocuments(newDocs);
+    // Append new documents to existing ones instead of replacing
+    setLabelDocuments(prevDocs => [...prevDocs, ...newDocs]);
     
     if (!selectedLabels.includes(labelId)) {
       setSelectedLabels([...selectedLabels, labelId]);
@@ -65,12 +67,12 @@ const LandingPage = () => {
   };
 
   const handleProcessFiles = (uploadType: 'bulk' | 'label') => {
-    if (uploadType === 'bulk' && (!bulkFiles || bulkFiles.length === 0)) {
+    if (uploadType === 'bulk' && bulkDocuments.length === 0) {
       toast.error("Please select at least one file to upload");
       return;
     }
 
-    if (uploadType === 'label' && (!labelFiles || labelFiles.length === 0)) {
+    if (uploadType === 'label' && labelDocuments.length === 0) {
       toast.error("Please select at least one file to upload");
       return;
     }
@@ -82,7 +84,7 @@ const LandingPage = () => {
 
     setIsLoading(true);
 
-    // Store the appropriate documents in sessionStorage
+    // Store the appropriate documents in sessionStorage and navigate immediately
     if (uploadType === 'bulk') {
       sessionStorage.setItem('uploadedDocuments', JSON.stringify(bulkDocuments));
       navigate("/workspace/bulk");

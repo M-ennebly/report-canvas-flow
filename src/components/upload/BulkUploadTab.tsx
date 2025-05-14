@@ -52,7 +52,7 @@ const BulkUploadTab: React.FC<BulkUploadTabProps> = ({
               Processing...
             </>
           ) : (
-            "Process and Extract Figures"
+            "Go to Workspace"
           )}
         </Button>
       </div>

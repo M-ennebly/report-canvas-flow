@@ -73,7 +73,7 @@ const LabelUploadTab: React.FC<LabelUploadTabProps> = ({
               Processing...
             </>
           ) : (
-            "Process and Extract Figures"
+            "Go to Workspace"
           )}
         </Button>
       </div>
