@@ -58,7 +58,7 @@ const WorkspaceContent: React.FC<WorkspaceContentProps> = ({
 
   return (
     <div className="flex-grow flex overflow-hidden">
-      {/* Left Document Panel - now takes no space when collapsed */}
+      {/* Left Document Panel - using flex-none to avoid it taking space when collapsed */}
       <div className="hidden md:flex">
         <DocumentPanel
           project={project}

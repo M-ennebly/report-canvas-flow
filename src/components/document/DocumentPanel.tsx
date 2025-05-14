@@ -30,7 +30,7 @@ const DocumentPanel: React.FC<DocumentPanelProps> = ({
   if (!isOpen) {
     return (
       <button 
-        className="h-full w-auto px-2 border-r flex items-center justify-center hover:bg-slate-100"
+        className="h-12 w-auto px-2 border-r flex items-center justify-center hover:bg-slate-100"
         onClick={() => setIsOpen(true)}
         aria-label="Open project details"
         title="Open project details"
