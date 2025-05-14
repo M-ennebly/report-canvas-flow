@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Task, Figure } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronUp, X } from "lucide-react";
 import { toast } from "sonner";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface TaskEditorSidebarProps {
   task: Task | null;
@@ -98,12 +98,14 @@ const TaskEditorSidebar: React.FC<TaskEditorSidebarProps> = ({
                 <div className="space-y-4">
                   {editedTask.figures.map((figure, index) => (
                     <div key={figure.id} className="border rounded-md p-4 space-y-3">
-                      <div className="aspect-video overflow-hidden rounded-md bg-slate-100">
-                        <img
-                          src={figure.imageUrl}
-                          alt={figure.title}
-                          className="w-full h-full object-cover"
-                        />
+                      <div className="overflow-hidden rounded-md">
+                        <AspectRatio ratio={16/9}>
+                          <img
+                            src={figure.imageUrl}
+                            alt={figure.title}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        </AspectRatio>
                       </div>
                       
                       <div className="space-y-2">

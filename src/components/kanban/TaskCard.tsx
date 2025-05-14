@@ -2,6 +2,7 @@
 import React from "react";
 import { Task } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface TaskCardProps {
   task: Task;
@@ -33,15 +34,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, onDragStart }) => {
           
           <div className="grid grid-cols-2 gap-2">
             {task.figures.slice(0, 4).map((figure) => (
-              <div key={figure.id} className="aspect-video relative rounded bg-slate-100 overflow-hidden">
-                <img
-                  src={figure.imageUrl}
-                  alt={figure.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-[10px] p-1 truncate">
-                  {figure.title}
-                </div>
+              <div key={figure.id} className="relative rounded overflow-hidden bg-slate-100">
+                <AspectRatio ratio={16/9}>
+                  <img
+                    src={figure.imageUrl}
+                    alt={figure.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-[10px] p-1 truncate">
+                    {figure.title}
+                  </div>
+                </AspectRatio>
               </div>
             ))}
           </div>

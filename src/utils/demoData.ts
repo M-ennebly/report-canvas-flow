@@ -1,19 +1,82 @@
 import { Task } from "@/types";
 
-// Sample image URLs for figures
-const figureImages = [
-  "/placeholder.svg",
-  "https://source.unsplash.com/random/800x600/?engineering",
-  "https://source.unsplash.com/random/800x600/?machine",
-  "https://source.unsplash.com/random/800x600/?agriculture",
-  "https://source.unsplash.com/random/800x600/?processing"
-];
+// Better image URLs for figures based on engineering/industrial themes
+const figureImages = {
+  refrigeration: [
+    "https://source.unsplash.com/random/800x600/?refrigeration",
+    "https://source.unsplash.com/random/800x600/?cold+storage",
+    "https://source.unsplash.com/random/800x600/?industrial+cooling"
+  ],
+  conveyor: [
+    "https://source.unsplash.com/random/800x600/?conveyor+belt",
+    "https://source.unsplash.com/random/800x600/?factory+automation",
+    "https://source.unsplash.com/random/800x600/?industrial+machinery"
+  ],
+  filter: [
+    "https://source.unsplash.com/random/800x600/?industrial+filter",
+    "https://source.unsplash.com/random/800x600/?sorting+machine",
+    "https://source.unsplash.com/random/800x600/?filtration+system" 
+  ],
+  optical: [
+    "https://source.unsplash.com/random/800x600/?optical+scanner",
+    "https://source.unsplash.com/random/800x600/?quality+inspection",
+    "https://source.unsplash.com/random/800x600/?vision+system"
+  ],
+  analysis: [
+    "https://source.unsplash.com/random/800x600/?data+analysis",
+    "https://source.unsplash.com/random/800x600/?chart+graph",
+    "https://source.unsplash.com/random/800x600/?data+visualization" 
+  ],
+  energy: [
+    "https://source.unsplash.com/random/800x600/?energy+efficiency",
+    "https://source.unsplash.com/random/800x600/?renewable+energy",
+    "https://source.unsplash.com/random/800x600/?power+consumption" 
+  ],
+  cost: [
+    "https://source.unsplash.com/random/800x600/?cost+analysis",
+    "https://source.unsplash.com/random/800x600/?business+chart",
+    "https://source.unsplash.com/random/800x600/?financial+graph" 
+  ],
+  shelling: [
+    "https://source.unsplash.com/random/800x600/?food+processing",
+    "https://source.unsplash.com/random/800x600/?industrial+blades",
+    "https://source.unsplash.com/random/800x600/?nut+processing" 
+  ],
+  sensors: [
+    "https://source.unsplash.com/random/800x600/?sensor+network",
+    "https://source.unsplash.com/random/800x600/?iot+devices",
+    "https://source.unsplash.com/random/800x600/?monitoring+system" 
+  ],
+  testing: [
+    "https://source.unsplash.com/random/800x600/?quality+testing",
+    "https://source.unsplash.com/random/800x600/?lab+testing",
+    "https://source.unsplash.com/random/800x600/?product+inspection" 
+  ],
+  mechanical: [
+    "https://source.unsplash.com/random/800x600/?mechanical+engineering",
+    "https://source.unsplash.com/random/800x600/?stress+testing",
+    "https://source.unsplash.com/random/800x600/?mechanical+analysis" 
+  ],
+  quality: [
+    "https://source.unsplash.com/random/800x600/?quality+control",
+    "https://source.unsplash.com/random/800x600/?product+quality",
+    "https://source.unsplash.com/random/800x600/?quality+check" 
+  ],
+  // Fallback images
+  fallback: [
+    "https://source.unsplash.com/random/800x600/?engineering",
+    "https://source.unsplash.com/random/800x600/?machine",
+    "https://source.unsplash.com/random/800x600/?agriculture",
+    "https://source.unsplash.com/random/800x600/?processing"
+  ]
+};
 
 // Predefined tasks and figures for the almond processing project
 const almondTasksData = {
   design: [
     {
       title: "Redesign of the Refrigerated Almond Storage Chamber",
+      category: "refrigeration",
       figures: [
         {
           title: "Storage Chamber Expansion Blueprint",
@@ -27,6 +90,7 @@ const almondTasksData = {
     },
     {
       title: "Design of the Enhanced Drying Conveyor System",
+      category: "conveyor",
       figures: [
         {
           title: "Drying Conveyor Side View",
@@ -40,6 +104,7 @@ const almondTasksData = {
     },
     {
       title: "Filter System Customization for Almond Sizing",
+      category: "filter",
       figures: [
         {
           title: "Modular Filter Components (Top View)",
@@ -53,6 +118,7 @@ const almondTasksData = {
     },
     {
       title: "Blueprint of the New Optical Selection Line",
+      category: "optical",
       figures: [
         {
           title: "Full Line Layout",
@@ -68,6 +134,7 @@ const almondTasksData = {
   analyse: [
     {
       title: "Efficiency Analysis of the Almond Drying System",
+      category: "analysis",
       figures: [
         {
           title: "Drying Process Flow Diagram",
@@ -81,6 +148,7 @@ const almondTasksData = {
     },
     {
       title: "Environmental Impact Study of Storage Expansion",
+      category: "energy",
       figures: [
         {
           title: "Refrigeration Energy Use Chart",
@@ -94,6 +162,7 @@ const almondTasksData = {
     },
     {
       title: "Cost-Benefit Study of Automated Sorting",
+      category: "cost",
       figures: [
         {
           title: "Labor Cost Comparison Table",
@@ -109,6 +178,7 @@ const almondTasksData = {
   dev: [
     {
       title: "Assembly of High-Speed Shelling Unit",
+      category: "shelling",
       figures: [
         {
           title: "Shelling Blades Installation Diagram",
@@ -122,6 +192,7 @@ const almondTasksData = {
     },
     {
       title: "Calibration of Optical Sorting Algorithms",
+      category: "optical",
       figures: [
         {
           title: "Image Recognition Heatmap",
@@ -135,6 +206,7 @@ const almondTasksData = {
     },
     {
       title: "Integration of Smart Sensors into Cold Storage",
+      category: "sensors",
       figures: [
         {
           title: "Sensor Grid Layout",
@@ -150,6 +222,7 @@ const almondTasksData = {
   testing: [
     {
       title: "Validation of Filter-Based Size Classification",
+      category: "testing",
       figures: [
         {
           title: "Before/After Sorting Comparison",
@@ -163,6 +236,7 @@ const almondTasksData = {
     },
     {
       title: "Mechanical Stress Testing of the Conveyor System",
+      category: "mechanical",
       figures: [
         {
           title: "Load Tolerance Curve",
@@ -176,6 +250,7 @@ const almondTasksData = {
     },
     {
       title: "Quality Control Test of Final Almond Output",
+      category: "quality",
       figures: [
         {
           title: "Quality Grade Distribution Chart",
@@ -265,11 +340,14 @@ export const generateDemoTasks = (
     if (columnData) {
       columnData.forEach((taskData, taskIndex) => {
         const taskId = `task-${column}-${taskIndex}`;
+        const category = taskData.category || "fallback";
+        const categoryImages = figureImages[category as keyof typeof figureImages] || figureImages.fallback;
+        
         const figures = taskData.figures.map((figureData, figureIndex) => ({
           id: `figure-${column}-${taskIndex}-${figureIndex}`,
           title: figureData.title,
           description: figureData.description,
-          imageUrl: figureImages[Math.floor(Math.random() * figureImages.length)],
+          imageUrl: categoryImages[figureIndex % categoryImages.length],
           pageNumber: Math.floor(Math.random() * 20) + 1,
         }));
         
@@ -298,7 +376,7 @@ export const generateDemoTasks = (
             id: `figure-${column}-${i}-${j}`,
             title: figureTitle,
             description: `Description for ${figureTitle}`,
-            imageUrl: figureImages[Math.floor(Math.random() * figureImages.length)],
+            imageUrl: figureImages.fallback[Math.floor(Math.random() * figureImages.fallback.length)],
             pageNumber: Math.floor(Math.random() * 20) + 1,
           });
         }
